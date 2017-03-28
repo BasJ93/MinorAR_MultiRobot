@@ -7,5 +7,6 @@
 - Swarm might contain specialised robots                            (ROS, HWA, MBSE, POR, Vision)
 
 ## Goals this week:
-- Rough Plan of Approach
-- Define the project using the Project Approval document
+- Concept research
+- Swarm applied research
+:shipit:
