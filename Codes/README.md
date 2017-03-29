@@ -15,4 +15,4 @@ foreign_relay : relay data from master to master.
 micros_swarm_framework : ROS framework for swarm creation.  
 multimaster_fkie : Multimaster framework.  
 http://answers.ros.org/question/41433/multiple-robots-simulation-and-navigation/  
-
+multi_robot_collision_avoidance : http://wiki.ros.org/multi_robot_collision_avoidance  
