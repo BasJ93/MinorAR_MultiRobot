@@ -1,0 +1,1 @@
+/usr/bin/c++  -fPIC -std=c++0x    -shared -Wl,-soname,libapp_loader.so -o /home/bas/catkin_ws_multirob/devel/lib/libapp_loader.so CMakeFiles/app_loader.dir/src/app_loader.cpp.o  -L/opt/ros/indigo/lib  -L/usr/lib/x86_64-linux-gnu/libboost_thread.so  -L/usr/lib/x86_64-linux-gnu/libboost_regex.so  -L/usr/lib/x86_64-linux-gnu/libboost_serialization.so 

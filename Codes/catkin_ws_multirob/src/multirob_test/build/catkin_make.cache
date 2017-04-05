@@ -1,0 +1,2 @@
+
+-DCATKIN_DEVEL_PREFIX=/home/bas/catkin_ws_multirob/src/multirob_test/devel -DCMAKE_INSTALL_PREFIX=/home/bas/catkin_ws_multirob/src/multirob_test/install -G Unix Makefiles

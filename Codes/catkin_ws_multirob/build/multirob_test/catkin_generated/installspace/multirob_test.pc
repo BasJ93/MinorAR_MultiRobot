@@ -1,0 +1,8 @@
+prefix=/home/bas/catkin_ws_multirob/install
+
+Name: multirob_test
+Description: Description of multirob_test
+Version: 0.0.0
+Cflags: -I/home/bas/catkin_ws_multirob/install/include
+Libs: -L/home/bas/catkin_ws_multirob/install/lib 
+Requires: 

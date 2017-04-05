@@ -1,0 +1,2 @@
+- setup-file:
+    local-name: /home/bas/catkin_ws_multirob/src/multirob_test/install/setup.sh

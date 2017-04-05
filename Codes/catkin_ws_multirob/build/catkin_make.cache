@@ -1,0 +1,2 @@
+micros_swarm_framework:multirob_test
+-DCATKIN_DEVEL_PREFIX=/home/bas/catkin_ws_multirob/devel -DCMAKE_INSTALL_PREFIX=/home/bas/catkin_ws_multirob/install -G Unix Makefiles

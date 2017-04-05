@@ -1,0 +1,4 @@
+<launch>
+<node name="rviz" pkg="rviz" type="rviz" args="-d $(find multirob_test)/includes/multirob_test.rviz">
+</node>
+</launch>

@@ -1,0 +1,8 @@
+prefix=/home/bas/catkin_ws_multirob/install
+
+Name: micros_swarm_framework
+Description: Description of micros_swarm_framework
+Version: 0.0.15
+Cflags: -I/home/bas/catkin_ws_multirob/install/include
+Libs: -L/home/bas/catkin_ws_multirob/install/lib -lmicros_swarm_framework
+Requires: roscpp rospy std_msgs nav_msgs geometry_msgs message_runtime
