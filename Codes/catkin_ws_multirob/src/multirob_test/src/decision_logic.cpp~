@@ -7,6 +7,10 @@
 
 #include <ros/ros.h>
 #include <boost/thread.hpp>
+//Include the simple_action_client
+#include <actionlib/client/simple_action_client.h>
+//Include the msg definitions for movebase.
+#include <move_base_msgs/MoveBaseAction.h>
 
 //Maybe revise msg to fit to all commands, not just pickup
 #include <multirob_test/cmdPickup.h>
@@ -24,6 +28,36 @@ struct robotPickupCommand {
 volatile robotPickupCommand previousPickupCommand;
 
 bool RobotHasCommand = false;
+
+//float dockLocatations[3][6] = {{x, y, qx, qy, qz, qw}, {x, y, qx, qy, qz, qw}, {x, y, qx, qy, qz, qw}};
+
+typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
+
+void moveToLocation(float x, float y, float qx, float qy, float qz, float qw)
+{
+  MoveBaseClient ac("move_base", true);
+  while(!ac.waitForServer(ros::Duration(5.0)))
+  {
+    ROS_INFO("Waiting for action server");
+  }
+
+  move_base_msgs::MoveBaseGoal goal;
+
+  goal.target_pose.header.frame_id = "/map";
+  goal.target_pose.header.stamp = ros::Time::now();
+
+  goal.target_pose.pose.position.x = x;
+  goal.target_pose.pose.position.y = y;
+
+  goal.target_pose.pose.orientation.x = qx;
+  goal.target_pose.pose.orientation.y = qy;
+  goal.target_pose.pose.orientation.z = qz;
+  goal.target_pose.pose.orientation.w = qw;
+
+  ac.sendGoal(goal);
+
+  ac.waitForResult();
+}
 
 void checkWithExisting(robotPickupCommand command)
 {
