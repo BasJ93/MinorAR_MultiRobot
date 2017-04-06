@@ -29,7 +29,7 @@ volatile robotPickupCommand previousPickupCommand;
 
 bool RobotHasCommand = false;
 
-//float dockLocatations[3][6] = {{x, y, qx, qy, qz, qw}, {x, y, qx, qy, qz, qw}, {x, y, qx, qy, qz, qw}};
+float dockLocatations[3][6] = {{-5.162, -5.257, 0.000, 0.000, 0.998, -0.066}, {-3.219, -2.244, 0.000, -0.000, -0.607, 0.794}, {8.782, -5.734, -0.000, -0.000, 0.803, 0.595}};
 
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
 
