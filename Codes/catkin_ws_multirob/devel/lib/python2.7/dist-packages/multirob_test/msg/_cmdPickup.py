@@ -7,15 +7,16 @@ import struct
 
 
 class cmdPickup(genpy.Message):
-  _md5sum = "cb7b87605e8df0a7af0a85afc4740a0a"
+  _md5sum = "56424df38f10c6e3d91bcb64ba6d8fa9"
   _type = "multirob_test/cmdPickup"
   _has_header = False #flag to mark the presence of a Header object
   _full_text = """string source
 string destination
+string product
 int32 amount
 """
-  __slots__ = ['source','destination','amount']
-  _slot_types = ['string','string','int32']
+  __slots__ = ['source','destination','product','amount']
+  _slot_types = ['string','string','string','int32']
 
   def __init__(self, *args, **kwds):
     """
@@ -25,7 +26,7 @@ int32 amount
     changes.  You cannot mix in-order arguments and keyword arguments.
 
     The available fields are:
-       source,destination,amount
+       source,destination,product,amount
 
     :param args: complete set of field values, in .msg order
     :param kwds: use keyword arguments corresponding to message field names
@@ -38,11 +39,14 @@ int32 amount
         self.source = ''
       if self.destination is None:
         self.destination = ''
+      if self.product is None:
+        self.product = ''
       if self.amount is None:
         self.amount = 0
     else:
       self.source = ''
       self.destination = ''
+      self.product = ''
       self.amount = 0
 
   def _get_types(self):
@@ -67,6 +71,15 @@ int32 amount
       else:
         buff.write(struct.pack('<I%ss'%length, length, _x))
       _x = self.destination
+      length = len(_x)
+      if python3 or type(_x) == unicode:
+        _x = _x.encode('utf-8')
+        length = len(_x)
+      if python3:
+        buff.write(struct.pack('<I%sB'%length, length, *_x))
+      else:
+        buff.write(struct.pack('<I%ss'%length, length, _x))
+      _x = self.product
       length = len(_x)
       if python3 or type(_x) == unicode:
         _x = _x.encode('utf-8')
@@ -106,6 +119,15 @@ int32 amount
         self.destination = str[start:end]
       start = end
       end += 4
+      (length,) = _struct_I.unpack(str[start:end])
+      start = end
+      end += length
+      if python3:
+        self.product = str[start:end].decode('utf-8')
+      else:
+        self.product = str[start:end]
+      start = end
+      end += 4
       (self.amount,) = _struct_i.unpack(str[start:end])
       return self
     except struct.error as e:
@@ -129,6 +151,15 @@ int32 amount
       else:
         buff.write(struct.pack('<I%ss'%length, length, _x))
       _x = self.destination
+      length = len(_x)
+      if python3 or type(_x) == unicode:
+        _x = _x.encode('utf-8')
+        length = len(_x)
+      if python3:
+        buff.write(struct.pack('<I%sB'%length, length, *_x))
+      else:
+        buff.write(struct.pack('<I%ss'%length, length, _x))
+      _x = self.product
       length = len(_x)
       if python3 or type(_x) == unicode:
         _x = _x.encode('utf-8')
@@ -167,6 +198,15 @@ int32 amount
         self.destination = str[start:end].decode('utf-8')
       else:
         self.destination = str[start:end]
+      start = end
+      end += 4
+      (length,) = _struct_I.unpack(str[start:end])
+      start = end
+      end += length
+      if python3:
+        self.product = str[start:end].decode('utf-8')
+      else:
+        self.product = str[start:end]
       start = end
       end += 4
       (self.amount,) = _struct_i.unpack(str[start:end])

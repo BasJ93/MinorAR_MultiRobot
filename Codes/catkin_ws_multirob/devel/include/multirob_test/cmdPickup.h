@@ -26,11 +26,13 @@ struct cmdPickup_
   cmdPickup_()
     : source()
     , destination()
+    , product()
     , amount(0)  {
     }
   cmdPickup_(const ContainerAllocator& _alloc)
     : source(_alloc)
     , destination(_alloc)
+    , product(_alloc)
     , amount(0)  {
   (void)_alloc;
     }
@@ -42,6 +44,9 @@ struct cmdPickup_
 
    typedef std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other >  _destination_type;
   _destination_type destination;
+
+   typedef std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other >  _product_type;
+  _product_type product;
 
    typedef int32_t _amount_type;
   _amount_type amount;
@@ -123,12 +128,12 @@ struct MD5Sum< ::multirob_test::cmdPickup_<ContainerAllocator> >
 {
   static const char* value()
   {
-    return "cb7b87605e8df0a7af0a85afc4740a0a";
+    return "56424df38f10c6e3d91bcb64ba6d8fa9";
   }
 
   static const char* value(const ::multirob_test::cmdPickup_<ContainerAllocator>&) { return value(); }
-  static const uint64_t static_value1 = 0xcb7b87605e8df0a7ULL;
-  static const uint64_t static_value2 = 0xaf0a85afc4740a0aULL;
+  static const uint64_t static_value1 = 0x56424df38f10c6e3ULL;
+  static const uint64_t static_value2 = 0xd91bcb64ba6d8fa9ULL;
 };
 
 template<class ContainerAllocator>
@@ -149,6 +154,7 @@ struct Definition< ::multirob_test::cmdPickup_<ContainerAllocator> >
   {
     return "string source\n\
 string destination\n\
+string product\n\
 int32 amount\n\
 ";
   }
@@ -170,6 +176,7 @@ namespace serialization
     {
       stream.next(m.source);
       stream.next(m.destination);
+      stream.next(m.product);
       stream.next(m.amount);
     }
 
@@ -193,6 +200,8 @@ struct Printer< ::multirob_test::cmdPickup_<ContainerAllocator> >
     Printer<std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other > >::stream(s, indent + "  ", v.source);
     s << indent << "destination: ";
     Printer<std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other > >::stream(s, indent + "  ", v.destination);
+    s << indent << "product: ";
+    Printer<std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other > >::stream(s, indent + "  ", v.product);
     s << indent << "amount: ";
     Printer<int32_t>::stream(s, indent + "  ", v.amount);
   }

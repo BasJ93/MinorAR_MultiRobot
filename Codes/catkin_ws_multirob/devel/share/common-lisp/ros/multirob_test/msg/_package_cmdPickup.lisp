@@ -3,6 +3,8 @@
           SOURCE
           DESTINATION-VAL
           DESTINATION
+          PRODUCT-VAL
+          PRODUCT
           AMOUNT-VAL
           AMOUNT
 ))
