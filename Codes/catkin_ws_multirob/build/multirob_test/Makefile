@@ -248,62 +248,6 @@ actionlib_msgs_generate_messages_py/fast:
 .PHONY : actionlib_msgs_generate_messages_py/fast
 
 # Convenience name for target.
-multirob_test/CMakeFiles/dynamic_reconfigure_gencfg.dir/rule:
-	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f CMakeFiles/Makefile2 multirob_test/CMakeFiles/dynamic_reconfigure_gencfg.dir/rule
-.PHONY : multirob_test/CMakeFiles/dynamic_reconfigure_gencfg.dir/rule
-
-# Convenience name for target.
-dynamic_reconfigure_gencfg: multirob_test/CMakeFiles/dynamic_reconfigure_gencfg.dir/rule
-.PHONY : dynamic_reconfigure_gencfg
-
-# fast build rule for target.
-dynamic_reconfigure_gencfg/fast:
-	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f multirob_test/CMakeFiles/dynamic_reconfigure_gencfg.dir/build.make multirob_test/CMakeFiles/dynamic_reconfigure_gencfg.dir/build
-.PHONY : dynamic_reconfigure_gencfg/fast
-
-# Convenience name for target.
-multirob_test/CMakeFiles/dynamic_reconfigure_generate_messages_cpp.dir/rule:
-	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f CMakeFiles/Makefile2 multirob_test/CMakeFiles/dynamic_reconfigure_generate_messages_cpp.dir/rule
-.PHONY : multirob_test/CMakeFiles/dynamic_reconfigure_generate_messages_cpp.dir/rule
-
-# Convenience name for target.
-dynamic_reconfigure_generate_messages_cpp: multirob_test/CMakeFiles/dynamic_reconfigure_generate_messages_cpp.dir/rule
-.PHONY : dynamic_reconfigure_generate_messages_cpp
-
-# fast build rule for target.
-dynamic_reconfigure_generate_messages_cpp/fast:
-	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f multirob_test/CMakeFiles/dynamic_reconfigure_generate_messages_cpp.dir/build.make multirob_test/CMakeFiles/dynamic_reconfigure_generate_messages_cpp.dir/build
-.PHONY : dynamic_reconfigure_generate_messages_cpp/fast
-
-# Convenience name for target.
-multirob_test/CMakeFiles/dynamic_reconfigure_generate_messages_lisp.dir/rule:
-	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f CMakeFiles/Makefile2 multirob_test/CMakeFiles/dynamic_reconfigure_generate_messages_lisp.dir/rule
-.PHONY : multirob_test/CMakeFiles/dynamic_reconfigure_generate_messages_lisp.dir/rule
-
-# Convenience name for target.
-dynamic_reconfigure_generate_messages_lisp: multirob_test/CMakeFiles/dynamic_reconfigure_generate_messages_lisp.dir/rule
-.PHONY : dynamic_reconfigure_generate_messages_lisp
-
-# fast build rule for target.
-dynamic_reconfigure_generate_messages_lisp/fast:
-	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f multirob_test/CMakeFiles/dynamic_reconfigure_generate_messages_lisp.dir/build.make multirob_test/CMakeFiles/dynamic_reconfigure_generate_messages_lisp.dir/build
-.PHONY : dynamic_reconfigure_generate_messages_lisp/fast
-
-# Convenience name for target.
-multirob_test/CMakeFiles/dynamic_reconfigure_generate_messages_py.dir/rule:
-	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f CMakeFiles/Makefile2 multirob_test/CMakeFiles/dynamic_reconfigure_generate_messages_py.dir/rule
-.PHONY : multirob_test/CMakeFiles/dynamic_reconfigure_generate_messages_py.dir/rule
-
-# Convenience name for target.
-dynamic_reconfigure_generate_messages_py: multirob_test/CMakeFiles/dynamic_reconfigure_generate_messages_py.dir/rule
-.PHONY : dynamic_reconfigure_generate_messages_py
-
-# fast build rule for target.
-dynamic_reconfigure_generate_messages_py/fast:
-	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f multirob_test/CMakeFiles/dynamic_reconfigure_generate_messages_py.dir/build.make multirob_test/CMakeFiles/dynamic_reconfigure_generate_messages_py.dir/build
-.PHONY : dynamic_reconfigure_generate_messages_py/fast
-
-# Convenience name for target.
 multirob_test/CMakeFiles/geometry_msgs_generate_messages_cpp.dir/rule:
 	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f CMakeFiles/Makefile2 multirob_test/CMakeFiles/geometry_msgs_generate_messages_cpp.dir/rule
 .PHONY : multirob_test/CMakeFiles/geometry_msgs_generate_messages_cpp.dir/rule
@@ -344,20 +288,6 @@ geometry_msgs_generate_messages_py: multirob_test/CMakeFiles/geometry_msgs_gener
 geometry_msgs_generate_messages_py/fast:
 	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f multirob_test/CMakeFiles/geometry_msgs_generate_messages_py.dir/build.make multirob_test/CMakeFiles/geometry_msgs_generate_messages_py.dir/build
 .PHONY : geometry_msgs_generate_messages_py/fast
-
-# Convenience name for target.
-multirob_test/CMakeFiles/move_base_gencfg.dir/rule:
-	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f CMakeFiles/Makefile2 multirob_test/CMakeFiles/move_base_gencfg.dir/rule
-.PHONY : multirob_test/CMakeFiles/move_base_gencfg.dir/rule
-
-# Convenience name for target.
-move_base_gencfg: multirob_test/CMakeFiles/move_base_gencfg.dir/rule
-.PHONY : move_base_gencfg
-
-# fast build rule for target.
-move_base_gencfg/fast:
-	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f multirob_test/CMakeFiles/move_base_gencfg.dir/build.make multirob_test/CMakeFiles/move_base_gencfg.dir/build
-.PHONY : move_base_gencfg/fast
 
 # Convenience name for target.
 multirob_test/CMakeFiles/move_base_msgs_generate_messages_cpp.dir/rule:
@@ -640,6 +570,48 @@ rosgraph_msgs_generate_messages_py/fast:
 .PHONY : rosgraph_msgs_generate_messages_py/fast
 
 # Convenience name for target.
+multirob_test/CMakeFiles/sensor_msgs_generate_messages_cpp.dir/rule:
+	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f CMakeFiles/Makefile2 multirob_test/CMakeFiles/sensor_msgs_generate_messages_cpp.dir/rule
+.PHONY : multirob_test/CMakeFiles/sensor_msgs_generate_messages_cpp.dir/rule
+
+# Convenience name for target.
+sensor_msgs_generate_messages_cpp: multirob_test/CMakeFiles/sensor_msgs_generate_messages_cpp.dir/rule
+.PHONY : sensor_msgs_generate_messages_cpp
+
+# fast build rule for target.
+sensor_msgs_generate_messages_cpp/fast:
+	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f multirob_test/CMakeFiles/sensor_msgs_generate_messages_cpp.dir/build.make multirob_test/CMakeFiles/sensor_msgs_generate_messages_cpp.dir/build
+.PHONY : sensor_msgs_generate_messages_cpp/fast
+
+# Convenience name for target.
+multirob_test/CMakeFiles/sensor_msgs_generate_messages_lisp.dir/rule:
+	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f CMakeFiles/Makefile2 multirob_test/CMakeFiles/sensor_msgs_generate_messages_lisp.dir/rule
+.PHONY : multirob_test/CMakeFiles/sensor_msgs_generate_messages_lisp.dir/rule
+
+# Convenience name for target.
+sensor_msgs_generate_messages_lisp: multirob_test/CMakeFiles/sensor_msgs_generate_messages_lisp.dir/rule
+.PHONY : sensor_msgs_generate_messages_lisp
+
+# fast build rule for target.
+sensor_msgs_generate_messages_lisp/fast:
+	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f multirob_test/CMakeFiles/sensor_msgs_generate_messages_lisp.dir/build.make multirob_test/CMakeFiles/sensor_msgs_generate_messages_lisp.dir/build
+.PHONY : sensor_msgs_generate_messages_lisp/fast
+
+# Convenience name for target.
+multirob_test/CMakeFiles/sensor_msgs_generate_messages_py.dir/rule:
+	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f CMakeFiles/Makefile2 multirob_test/CMakeFiles/sensor_msgs_generate_messages_py.dir/rule
+.PHONY : multirob_test/CMakeFiles/sensor_msgs_generate_messages_py.dir/rule
+
+# Convenience name for target.
+sensor_msgs_generate_messages_py: multirob_test/CMakeFiles/sensor_msgs_generate_messages_py.dir/rule
+.PHONY : sensor_msgs_generate_messages_py
+
+# fast build rule for target.
+sensor_msgs_generate_messages_py/fast:
+	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f multirob_test/CMakeFiles/sensor_msgs_generate_messages_py.dir/build.make multirob_test/CMakeFiles/sensor_msgs_generate_messages_py.dir/build
+.PHONY : sensor_msgs_generate_messages_py/fast
+
+# Convenience name for target.
 multirob_test/CMakeFiles/std_msgs_generate_messages_cpp.dir/rule:
 	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f CMakeFiles/Makefile2 multirob_test/CMakeFiles/std_msgs_generate_messages_cpp.dir/rule
 .PHONY : multirob_test/CMakeFiles/std_msgs_generate_messages_cpp.dir/rule
@@ -681,6 +653,90 @@ std_msgs_generate_messages_py/fast:
 	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f multirob_test/CMakeFiles/std_msgs_generate_messages_py.dir/build.make multirob_test/CMakeFiles/std_msgs_generate_messages_py.dir/build
 .PHONY : std_msgs_generate_messages_py/fast
 
+# Convenience name for target.
+multirob_test/CMakeFiles/tf2_msgs_generate_messages_cpp.dir/rule:
+	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f CMakeFiles/Makefile2 multirob_test/CMakeFiles/tf2_msgs_generate_messages_cpp.dir/rule
+.PHONY : multirob_test/CMakeFiles/tf2_msgs_generate_messages_cpp.dir/rule
+
+# Convenience name for target.
+tf2_msgs_generate_messages_cpp: multirob_test/CMakeFiles/tf2_msgs_generate_messages_cpp.dir/rule
+.PHONY : tf2_msgs_generate_messages_cpp
+
+# fast build rule for target.
+tf2_msgs_generate_messages_cpp/fast:
+	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f multirob_test/CMakeFiles/tf2_msgs_generate_messages_cpp.dir/build.make multirob_test/CMakeFiles/tf2_msgs_generate_messages_cpp.dir/build
+.PHONY : tf2_msgs_generate_messages_cpp/fast
+
+# Convenience name for target.
+multirob_test/CMakeFiles/tf2_msgs_generate_messages_lisp.dir/rule:
+	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f CMakeFiles/Makefile2 multirob_test/CMakeFiles/tf2_msgs_generate_messages_lisp.dir/rule
+.PHONY : multirob_test/CMakeFiles/tf2_msgs_generate_messages_lisp.dir/rule
+
+# Convenience name for target.
+tf2_msgs_generate_messages_lisp: multirob_test/CMakeFiles/tf2_msgs_generate_messages_lisp.dir/rule
+.PHONY : tf2_msgs_generate_messages_lisp
+
+# fast build rule for target.
+tf2_msgs_generate_messages_lisp/fast:
+	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f multirob_test/CMakeFiles/tf2_msgs_generate_messages_lisp.dir/build.make multirob_test/CMakeFiles/tf2_msgs_generate_messages_lisp.dir/build
+.PHONY : tf2_msgs_generate_messages_lisp/fast
+
+# Convenience name for target.
+multirob_test/CMakeFiles/tf2_msgs_generate_messages_py.dir/rule:
+	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f CMakeFiles/Makefile2 multirob_test/CMakeFiles/tf2_msgs_generate_messages_py.dir/rule
+.PHONY : multirob_test/CMakeFiles/tf2_msgs_generate_messages_py.dir/rule
+
+# Convenience name for target.
+tf2_msgs_generate_messages_py: multirob_test/CMakeFiles/tf2_msgs_generate_messages_py.dir/rule
+.PHONY : tf2_msgs_generate_messages_py
+
+# fast build rule for target.
+tf2_msgs_generate_messages_py/fast:
+	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f multirob_test/CMakeFiles/tf2_msgs_generate_messages_py.dir/build.make multirob_test/CMakeFiles/tf2_msgs_generate_messages_py.dir/build
+.PHONY : tf2_msgs_generate_messages_py/fast
+
+# Convenience name for target.
+multirob_test/CMakeFiles/tf_generate_messages_cpp.dir/rule:
+	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f CMakeFiles/Makefile2 multirob_test/CMakeFiles/tf_generate_messages_cpp.dir/rule
+.PHONY : multirob_test/CMakeFiles/tf_generate_messages_cpp.dir/rule
+
+# Convenience name for target.
+tf_generate_messages_cpp: multirob_test/CMakeFiles/tf_generate_messages_cpp.dir/rule
+.PHONY : tf_generate_messages_cpp
+
+# fast build rule for target.
+tf_generate_messages_cpp/fast:
+	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f multirob_test/CMakeFiles/tf_generate_messages_cpp.dir/build.make multirob_test/CMakeFiles/tf_generate_messages_cpp.dir/build
+.PHONY : tf_generate_messages_cpp/fast
+
+# Convenience name for target.
+multirob_test/CMakeFiles/tf_generate_messages_lisp.dir/rule:
+	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f CMakeFiles/Makefile2 multirob_test/CMakeFiles/tf_generate_messages_lisp.dir/rule
+.PHONY : multirob_test/CMakeFiles/tf_generate_messages_lisp.dir/rule
+
+# Convenience name for target.
+tf_generate_messages_lisp: multirob_test/CMakeFiles/tf_generate_messages_lisp.dir/rule
+.PHONY : tf_generate_messages_lisp
+
+# fast build rule for target.
+tf_generate_messages_lisp/fast:
+	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f multirob_test/CMakeFiles/tf_generate_messages_lisp.dir/build.make multirob_test/CMakeFiles/tf_generate_messages_lisp.dir/build
+.PHONY : tf_generate_messages_lisp/fast
+
+# Convenience name for target.
+multirob_test/CMakeFiles/tf_generate_messages_py.dir/rule:
+	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f CMakeFiles/Makefile2 multirob_test/CMakeFiles/tf_generate_messages_py.dir/rule
+.PHONY : multirob_test/CMakeFiles/tf_generate_messages_py.dir/rule
+
+# Convenience name for target.
+tf_generate_messages_py: multirob_test/CMakeFiles/tf_generate_messages_py.dir/rule
+.PHONY : tf_generate_messages_py
+
+# fast build rule for target.
+tf_generate_messages_py/fast:
+	cd /home/bas/catkin_ws_multirob/build && $(MAKE) -f multirob_test/CMakeFiles/tf_generate_messages_py.dir/build.make multirob_test/CMakeFiles/tf_generate_messages_py.dir/build
+.PHONY : tf_generate_messages_py/fast
+
 src/decision_logic.o: src/decision_logic.cpp.o
 .PHONY : src/decision_logic.o
 
@@ -718,10 +774,6 @@ help:
 	@echo "... actionlib_msgs_generate_messages_cpp"
 	@echo "... actionlib_msgs_generate_messages_lisp"
 	@echo "... actionlib_msgs_generate_messages_py"
-	@echo "... dynamic_reconfigure_gencfg"
-	@echo "... dynamic_reconfigure_generate_messages_cpp"
-	@echo "... dynamic_reconfigure_generate_messages_lisp"
-	@echo "... dynamic_reconfigure_generate_messages_py"
 	@echo "... edit_cache"
 	@echo "... geometry_msgs_generate_messages_cpp"
 	@echo "... geometry_msgs_generate_messages_lisp"
@@ -730,7 +782,6 @@ help:
 	@echo "... install/local"
 	@echo "... install/strip"
 	@echo "... list_install_components"
-	@echo "... move_base_gencfg"
 	@echo "... move_base_msgs_generate_messages_cpp"
 	@echo "... move_base_msgs_generate_messages_lisp"
 	@echo "... move_base_msgs_generate_messages_py"
@@ -752,10 +803,19 @@ help:
 	@echo "... rosgraph_msgs_generate_messages_cpp"
 	@echo "... rosgraph_msgs_generate_messages_lisp"
 	@echo "... rosgraph_msgs_generate_messages_py"
+	@echo "... sensor_msgs_generate_messages_cpp"
+	@echo "... sensor_msgs_generate_messages_lisp"
+	@echo "... sensor_msgs_generate_messages_py"
 	@echo "... std_msgs_generate_messages_cpp"
 	@echo "... std_msgs_generate_messages_lisp"
 	@echo "... std_msgs_generate_messages_py"
 	@echo "... test"
+	@echo "... tf2_msgs_generate_messages_cpp"
+	@echo "... tf2_msgs_generate_messages_lisp"
+	@echo "... tf2_msgs_generate_messages_py"
+	@echo "... tf_generate_messages_cpp"
+	@echo "... tf_generate_messages_lisp"
+	@echo "... tf_generate_messages_py"
 	@echo "... src/decision_logic.o"
 	@echo "... src/decision_logic.i"
 	@echo "... src/decision_logic.s"

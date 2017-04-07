@@ -98,6 +98,8 @@
     <arg name="scan_topic"    value="/$(arg robot_name)/scan"/>
   </include>
 
+  <node name="decision_logic" type="decision_logic" pkg="multirob_test" output="screen" />
+
   <node name="relay" type="relay" pkg="topic_tools" args="/move_base_simple/goal /$(arg robot_name)/move_base_simple/goal">
   </node>
 

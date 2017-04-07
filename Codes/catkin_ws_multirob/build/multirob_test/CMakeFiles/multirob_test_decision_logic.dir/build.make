@@ -81,18 +81,21 @@ multirob_test_decision_logic_EXTERNAL_OBJECTS =
 
 /home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: multirob_test/CMakeFiles/multirob_test_decision_logic.dir/src/decision_logic.cpp.o
 /home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: multirob_test/CMakeFiles/multirob_test_decision_logic.dir/build.make
-/home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: /opt/ros/indigo/lib/libdynamic_reconfigure_config_init_mutex.so
+/home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: /opt/ros/indigo/lib/libtf.so
+/home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: /opt/ros/indigo/lib/libtf2_ros.so
 /home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: /opt/ros/indigo/lib/libactionlib.so
+/home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: /opt/ros/indigo/lib/libmessage_filters.so
 /home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: /opt/ros/indigo/lib/libroscpp.so
 /home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: /usr/lib/x86_64-linux-gnu/libboost_signals.so
 /home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: /usr/lib/x86_64-linux-gnu/libboost_filesystem.so
+/home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: /opt/ros/indigo/lib/libxmlrpcpp.so
+/home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: /opt/ros/indigo/lib/libtf2.so
+/home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: /opt/ros/indigo/lib/libroscpp_serialization.so
 /home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: /opt/ros/indigo/lib/librosconsole.so
 /home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: /opt/ros/indigo/lib/librosconsole_log4cxx.so
 /home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: /opt/ros/indigo/lib/librosconsole_backend_interface.so
 /home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: /usr/lib/liblog4cxx.so
 /home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: /usr/lib/x86_64-linux-gnu/libboost_regex.so
-/home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: /opt/ros/indigo/lib/libxmlrpcpp.so
-/home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: /opt/ros/indigo/lib/libroscpp_serialization.so
 /home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: /opt/ros/indigo/lib/librostime.so
 /home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: /usr/lib/x86_64-linux-gnu/libboost_date_time.so
 /home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: /opt/ros/indigo/lib/libcpp_common.so
