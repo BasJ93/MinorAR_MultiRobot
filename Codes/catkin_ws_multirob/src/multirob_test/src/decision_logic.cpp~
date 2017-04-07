@@ -12,6 +12,10 @@
 //Include the msg definitions for movebase.
 #include <move_base_msgs/MoveBaseAction.h>
 
+#include <move_base/move_base.h>
+
+#include <nav_msgs/GetPlan.h>
+
 //Maybe revise msg to fit to all commands, not just pickup
 #include <multirob_test/cmdPickup.h>
 
@@ -57,6 +61,40 @@ void moveToLocation(float x, float y, float qx, float qy, float qz, float qw)
   ac.sendGoal(goal);
 
   ac.waitForResult();
+}
+
+int calcGoalDistance(float x, float y, float qx, float qy, float qz, float qw)
+{
+  ros::NodeHandle n;
+  ros::ServiceClient client = n.serviceClient<nav_msgs::GetPlan>("move_base_node/make_plan");
+  nav_msgs::GetPlan plan;
+
+  plan.request.start.header.frame_id = "base_link";
+  plan.request.start.header.stamp = ros::Time::now();
+  plan.request.start.pose.position.x = 0.0;
+  plan.request.start.pose.position.y = 0.0;
+
+  plan.request.goal.header.frame_id = "/map";
+  plan.request.goal.header.stamp = ros::Time::now();
+  plan.request.goal.pose.position.x = x;
+  plan.request.goal.pose.position.y = y;
+  plan.request.goal.pose.orientation.x = qx;
+  plan.request.goal.pose.orientation.y = qy;
+  plan.request.goal.pose.orientation.z = qz;
+  plan.request.goal.pose.orientation.w = qw;
+
+  plan.request.tolerance = 0.10;
+
+  if (client.call(plan))
+  {
+  //  ROS_INFO("Sum: %ld", (long int)srv.response.sum);
+    return 0;
+  }
+  else
+  {
+  //  ROS_ERROR("Failed to call service add_two_ints");
+    return 1;
+  }
 }
 
 void checkWithExisting(robotPickupCommand command)

@@ -81,6 +81,8 @@ multirob_test_decision_logic_EXTERNAL_OBJECTS =
 
 /home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: multirob_test/CMakeFiles/multirob_test_decision_logic.dir/src/decision_logic.cpp.o
 /home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: multirob_test/CMakeFiles/multirob_test_decision_logic.dir/build.make
+/home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: /opt/ros/indigo/lib/libdynamic_reconfigure_config_init_mutex.so
+/home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: /opt/ros/indigo/lib/libactionlib.so
 /home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: /opt/ros/indigo/lib/libroscpp.so
 /home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: /usr/lib/x86_64-linux-gnu/libboost_signals.so
 /home/bas/catkin_ws_multirob/devel/lib/multirob_test/decision_logic: /usr/lib/x86_64-linux-gnu/libboost_filesystem.so

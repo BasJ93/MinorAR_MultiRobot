@@ -27,6 +27,14 @@ ros/ros.h
 -
 boost/thread.hpp
 -
+actionlib/client/simple_action_client.h
+-
+move_base_msgs/MoveBaseAction.h
+-
+move_base/move_base.h
+-
+nav_msgs/GetPlan.h
+-
 multirob_test/cmdPickup.h
 -
 
