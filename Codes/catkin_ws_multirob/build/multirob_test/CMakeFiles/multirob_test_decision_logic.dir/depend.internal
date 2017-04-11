@@ -3,4 +3,5 @@
 
 multirob_test/CMakeFiles/multirob_test_decision_logic.dir/src/decision_logic.cpp.o
  /home/bas/catkin_ws_multirob/devel/include/multirob_test/cmdPickup.h
+ /home/bas/catkin_ws_multirob/devel/include/multirob_test/r2rpickupresponse.h
  /home/bas/catkin_ws_multirob/src/multirob_test/src/decision_logic.cpp

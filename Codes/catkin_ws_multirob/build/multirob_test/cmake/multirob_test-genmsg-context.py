@@ -1,6 +1,6 @@
 # generated from genmsg/cmake/pkg-genmsg.context.in
 
-messages_str = "/home/bas/catkin_ws_multirob/src/multirob_test/msg/cmdPickup.msg"
+messages_str = "/home/bas/catkin_ws_multirob/src/multirob_test/msg/cmdPickup.msg;/home/bas/catkin_ws_multirob/src/multirob_test/msg/r2rpickupresponse.msg"
 services_str = ""
 pkg_name = "multirob_test"
 dependencies_str = "std_msgs"

@@ -1,6 +1,7 @@
 FILE(REMOVE_RECURSE
   "CMakeFiles/multirob_test_generate_messages_py"
   "/home/bas/catkin_ws_multirob/devel/lib/python2.7/dist-packages/multirob_test/msg/_cmdPickup.py"
+  "/home/bas/catkin_ws_multirob/devel/lib/python2.7/dist-packages/multirob_test/msg/_r2rpickupresponse.py"
   "/home/bas/catkin_ws_multirob/devel/lib/python2.7/dist-packages/multirob_test/msg/__init__.py"
 )
 

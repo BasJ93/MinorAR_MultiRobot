@@ -118,6 +118,7 @@ IF(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   INCLUDE("/home/bas/catkin_ws_multirob/build/gtest/cmake_install.cmake")
   INCLUDE("/home/bas/catkin_ws_multirob/build/multirob_test/cmake_install.cmake")
+  INCLUDE("/home/bas/catkin_ws_multirob/build/ar_hwa/cmake_install.cmake")
   INCLUDE("/home/bas/catkin_ws_multirob/build/micros_swarm_framework/cmake_install.cmake")
 
 ENDIF(NOT CMAKE_INSTALL_LOCAL_ONLY)
