@@ -44,6 +44,9 @@ struct robotPickupCommand {
 //Keep a records of the previous/active pickup command
 volatile robotPickupCommand previousPickupCommand;
 
+//volatile
+multirob_test::r2rpickupresponse robotResponses[10];
+
 bool RobotHasCommand = false;
 
 std::string dockNames[3] = {"A", "B", "C"};
@@ -85,6 +88,11 @@ void moveToLocation(float x, float y, float qx, float qy, float qz, float qw)
   ac.sendGoal(goal);
   //Wait for the action to complete.
   ac.waitForResult();
+}
+
+void executeCommand(void)
+{
+  ROS_INFO("%s will execute the command.", robotName.c_str());
 }
 
 //Function to calculate the disatance from the robot to a given target location, in the x,y and quaternion notation. Returns a float representing the lenght of the path.
@@ -241,7 +249,57 @@ void startNewCommand(robotPickupCommand command)
 
 void responseReceived(multirob_test::r2rpickupresponse response)
 {
-  
+  robotResponses[response.robot].robot = response.robot;
+  robotResponses[response.robot].pickup.source = response.pickup.source;
+  robotResponses[response.robot].pickup.destination = response.pickup.destination;
+  robotResponses[response.robot].pickup.amount = response.pickup.amount;
+  robotResponses[response.robot].canDo = response.canDo;
+  robotResponses[response.robot].distance = response.distance;
+  robotResponses[response.robot].space = response.space;
+  //@TODO Add decision making based on received responses. Determine if the robot should move if it is the closesed to the target. Determine if the robot should move if the other robot does not have enough space.
+
+  bool runCommand = false;
+
+  //This is a bad implementation, find a better way to do it. 
+  if(robotResponses[1].robot == 1 && robotResponses[2].robot == 2 && robotResponses[3].robot == 3 && robotResponses[4].robot == 4)
+  {
+    if(robotResponses[int(robotName.at(robotName.size() - 1)) - 48].canDo)
+    {
+      for(int i=0; i<numberOfRobots+1; i++)
+      {
+        if(robotResponses[i].robot == int(robotName.at(robotName.size() - 1)) - 48)
+        {
+
+        }
+        else
+        {
+          if(robotResponses[i].canDo)
+          {
+            if(robotResponses[int(robotName.at(robotName.size() - 1)) - 48].distance < robotResponses[i].distance)
+            {
+              runCommand = true;
+            }
+            else
+            {
+              runCommand = false;
+            }
+          }
+          else
+          {
+            runCommand = true;
+          }
+        }
+      }
+      if(runCommand)
+      {
+        executeCommand();
+      }
+    }
+    for(int i=0; i<numberOfRobots; i++)
+    {
+      robotResponses[i].robot = 0;
+    }
+  }
 }
 
 //Callback function when a new command msg is received
