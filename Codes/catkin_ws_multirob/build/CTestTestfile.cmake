@@ -6,4 +6,5 @@
 # testing this directory and lists subdirectories to be tested as well.
 SUBDIRS(gtest)
 SUBDIRS(multirob_test)
+SUBDIRS(ar_hwa)
 SUBDIRS(micros_swarm_framework)

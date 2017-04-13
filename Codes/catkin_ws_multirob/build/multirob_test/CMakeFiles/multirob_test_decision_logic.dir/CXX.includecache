@@ -22,6 +22,24 @@ ros/builtin_message_traits.h
 ros/message_operations.h
 -
 
+/home/bas/catkin_ws_multirob/devel/include/multirob_test/r2rpickupresponse.h
+string
+-
+vector
+-
+map
+-
+ros/types.h
+-
+ros/serialization.h
+-
+ros/builtin_message_traits.h
+-
+ros/message_operations.h
+-
+multirob_test/cmdPickup.h
+-
+
 /home/bas/catkin_ws_multirob/src/multirob_test/src/decision_logic.cpp
 ros/ros.h
 -
@@ -42,6 +60,8 @@ geometry_msgs/PoseStamped.h
 geometry_msgs/Quaternion.h
 -
 multirob_test/cmdPickup.h
+-
+multirob_test/r2rpickupresponse.h
 -
 math.h
 -
