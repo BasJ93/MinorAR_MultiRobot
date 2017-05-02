@@ -59,6 +59,7 @@ ros::Publisher robotComms; //This would not be thread safe
 std::string robotName;
 int numberOfRobots;
 int storageSize;
+bool sim;
 
 //Function to send the robot to a location. Pass the locatation as an x,y coordinate and a rotation in quaternion notation.
 void moveToLocation(float x, float y, float qx, float qy, float qz, float qw)
@@ -84,15 +85,28 @@ void moveToLocation(float x, float y, float qx, float qy, float qz, float qw)
   goal.target_pose.pose.orientation.z = qz;
   goal.target_pose.pose.orientation.w = qw;
 
-  //Send the goal to move_base
-  ac.sendGoal(goal);
-  //Wait for the action to complete.
-  ac.waitForResult();
+  if(sim)
+  {
+    //Send the goal to move_base
+    ac.sendGoal(goal);
+    //Wait for the action to complete.
+    ac.waitForResult();
+  }
 }
 
-void executeCommand(void)
+void executeCommand(std::string source, std::string destination)
 {
   ROS_INFO("%s will execute the command.", robotName.c_str());
+  RobotHasCommand = true;
+  
+  for(int i=0; i<3; i++)
+  {
+    if(source.compare(dockNames[i]) == 0)
+    {
+      moveToLocation(dockLocations[i][0], dockLocations[i][1], dockLocations[i][2], dockLocations[i][3], dockLocations[i][4], dockLocations[i][5]);
+      break;
+    }
+  }
 }
 
 //Function to calculate the disatance from the robot to a given target location, in the x,y and quaternion notation. Returns a float representing the lenght of the path.
@@ -188,7 +202,14 @@ float calcGoalDistance(float x, float y, float qx, float qy, float qz, float qw)
 int checkInventory(void)
 {
   //Normaly we would check the I/O's representing the loaded products, but we currently have a simulation.
-  return storageSize;
+  if(sim)
+  {
+    return storageSize;
+  }
+  else
+  {
+    return 0;
+  }
 }
 
 int sendToOtherRobots(multirob_test::r2rpickupresponse response)
@@ -232,7 +253,7 @@ void startNewCommand(robotPickupCommand command)
   if(distance != -1 && space > 0)
   {
     response.canDo = true;
-    response.distance = distance;
+    response.distance = int(distance * 1000);
     response.space = space;
   }
   else
@@ -256,11 +277,10 @@ void responseReceived(multirob_test::r2rpickupresponse response)
   robotResponses[response.robot].canDo = response.canDo;
   robotResponses[response.robot].distance = response.distance;
   robotResponses[response.robot].space = response.space;
-  //@TODO Add decision making based on received responses. Determine if the robot should move if it is the closesed to the target. Determine if the robot should move if the other robot does not have enough space.
 
   bool runCommand = false;
 
-  //This is a bad implementation, find a better way to do it. 
+  //@TODO:This is a bad implementation, find a better way to do it. Something breaks, because two robots execute a command for a single robot, based on the distance. Let's convert the distance from qa float to an int, with a known multiplier.
   if(robotResponses[1].robot == 1 && robotResponses[2].robot == 2 && robotResponses[3].robot == 3 && robotResponses[4].robot == 4)
   {
     if(robotResponses[int(robotName.at(robotName.size() - 1)) - 48].canDo)
@@ -269,7 +289,7 @@ void responseReceived(multirob_test::r2rpickupresponse response)
       {
         if(robotResponses[i].robot == int(robotName.at(robotName.size() - 1)) - 48)
         {
-
+          runCommand = false;
         }
         else
         {
@@ -292,7 +312,7 @@ void responseReceived(multirob_test::r2rpickupresponse response)
       }
       if(runCommand)
       {
-        executeCommand();
+        executeCommand(robotResponses[int(robotName.at(robotName.size() - 1)) - 48].pickup.source, robotResponses[int(robotName.at(robotName.size() - 1)) - 48].pickup.destination);
       }
     }
     for(int i=0; i<numberOfRobots; i++)
@@ -338,6 +358,7 @@ int main(int argc, char** argv)
   ros::init(argc, argv, "decision_logic");
 
   ros::NodeHandle node;
+  ros::NodeHandle nh("~");
 
   ros::Subscriber pickup_command = node.subscribe("/pickup_command", 1, commandReceived);
   robotComms = node.advertise<multirob_test::r2rpickupresponse>( "/pickup_responses", 0 );
@@ -354,6 +375,16 @@ int main(int argc, char** argv)
     robotName = "noName";
   }
   ROS_INFO("Robot name %s", robotName.c_str());
+
+  if(nh.hasParam("sim"))
+  {
+    nh.getParam("sim", sim);
+  }
+  else
+  {
+    sim = false;
+  }
+  ROS_INFO("Simulation: %s", sim ? "true" : "false");
 
   node.getParam("robots_number", numberOfRobots);
   node.getParam("storage_size", storageSize);

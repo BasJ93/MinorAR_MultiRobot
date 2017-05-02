@@ -9,7 +9,7 @@
     <arg name="gui" value="true"/>
   </include>
   <!-- Map server -->
-  <arg name="map_file" default="$(find multirob_test)/maps/gazebo_1.yaml"/>
+  <arg name="map_file" default="$(find multirob_test)/maps/gazebo_2.yaml"/>
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" unless="$(arg mapping)">
        <param name="frame_id" value="/map"/>
   </node>
