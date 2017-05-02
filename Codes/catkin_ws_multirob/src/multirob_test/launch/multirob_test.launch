@@ -1,4 +1,5 @@
 <launch>
+  <arg name="sim" default="true" />
   <arg name="mapping" default="false" />
   <arg name="3d_sensor" value="$(optenv TURTLEBOT_3D_SENSOR astra)"/>
   <!-- gazebo world start -->
@@ -17,6 +18,7 @@
 
   <include file="$(find multirob_test)/includes/agents.launch.xml">
     <arg name="mapping" value="$(arg mapping)" />
+    <arg name="sim" value="$(arg sim)" />
   </include>
 
   <group if="$(arg mapping)">

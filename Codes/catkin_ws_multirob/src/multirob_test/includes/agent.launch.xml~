@@ -4,6 +4,7 @@
   <arg name="initial_pose_z" default="0" />
   <arg name="initial_pose_yaw" default="0" />
   <arg name="robot_name"/>
+  <arg name="sim" default="true" />
 
   <arg name="init_pose" value="-x $(arg initial_pose_x) -y $(arg initial_pose_y) -z $(arg initial_pose_z) -Y $(arg initial_pose_yaw)"/>
 
@@ -99,8 +100,10 @@
   </include>
 
   <param name="robot_name" value="$(arg robot_name)" />
+  <param name="robots_number" value="4" />
+  <param name="storage_size" value="6" />
   <node name="decision_logic" type="decision_logic" pkg="multirob_test" output="screen" >
-    
+    <arg name="sim" value="$(arg sim)" />
   </node>
 
   <node name="relay" type="relay" pkg="topic_tools" args="/move_base_simple/goal /$(arg robot_name)/move_base_simple/goal">
