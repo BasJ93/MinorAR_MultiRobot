@@ -117,9 +117,17 @@ ENDIF(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unsp
 IF(NOT CMAKE_INSTALL_LOCAL_ONLY)
   # Include the install script for each subdirectory.
   INCLUDE("/home/bas/catkin_ws_multirob/build/gtest/cmake_install.cmake")
+  INCLUDE("/home/bas/catkin_ws_multirob/build/descartes/descartes/cmake_install.cmake")
   INCLUDE("/home/bas/catkin_ws_multirob/build/multirob_test/cmake_install.cmake")
   INCLUDE("/home/bas/catkin_ws_multirob/build/ar_hwa/cmake_install.cmake")
   INCLUDE("/home/bas/catkin_ws_multirob/build/micros_swarm_framework/cmake_install.cmake")
+  INCLUDE("/home/bas/catkin_ws_multirob/build/descartes/descartes_core/cmake_install.cmake")
+  INCLUDE("/home/bas/catkin_ws_multirob/build/descartes/descartes_trajectory/cmake_install.cmake")
+  INCLUDE("/home/bas/catkin_ws_multirob/build/descartes/descartes_planner/cmake_install.cmake")
+  INCLUDE("/home/bas/catkin_ws_multirob/build/descartes/descartes_utilities/cmake_install.cmake")
+  INCLUDE("/home/bas/catkin_ws_multirob/build/descartes/descartes_moveit/cmake_install.cmake")
+  INCLUDE("/home/bas/catkin_ws_multirob/build/ar_por/cmake_install.cmake")
+  INCLUDE("/home/bas/catkin_ws_multirob/build/descartes_tutorials/descartes_tutorials/cmake_install.cmake")
 
 ENDIF(NOT CMAKE_INSTALL_LOCAL_ONLY)
 
