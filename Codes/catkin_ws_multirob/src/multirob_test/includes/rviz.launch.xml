@@ -1,4 +1,11 @@
 <launch>
-<node name="rviz" pkg="rviz" type="rviz" args="-d $(find multirob_test)/includes/multirob_test.rviz">
-</node>
+  <arg name="sim" default="true"/>
+  <group if="$(arg sim)">
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find multirob_test)/includes/multirob_test.rviz">
+    </node>
+  </group>
+  <group unless="$(arg sim)">
+    <node name="rviz" pkg="rviz" type="rviz" args="-d $(find multirob_test)/includes/multirob.rviz">
+    </node>
+  </group>
 </launch>
