@@ -1,5 +1,6 @@
 /****************************************/
-/*  Bas Janssen                         */
+/*  Bas Janssen 			*/
+/*  Dimitri Waard                       */
 /*  Fontys 2017                         */
 /****************************************/
 
@@ -47,7 +48,7 @@ volatile robotPickupCommand previousPickupCommand;
 //volatile
 multirob_test::r2rpickupresponse robotResponses[10];
 
-bool RobotHasCommand = false;
+volatile bool RobotHasCommand = false;
 
 std::string dockNames[3] = {"A", "B", "C"};
 float dockLocations[3][6] = {{-5.162, -5.257, 0.000, 0.000, 0.998, -0.066}, {-3.219, -2.244, 0.000, -0.000, -0.607, 0.794}, {8.782, -5.734, -0.000, -0.000, 0.803, 0.595}};
@@ -107,6 +108,15 @@ void executeCommand(std::string source, std::string destination)
       break;
     }
   }
+  for(int i=0; i<3; i++)
+  {
+    if(destination.compare(dockNames[i]) == 0)
+    {
+      moveToLocation(dockLocations[i][0], dockLocations[i][1], dockLocations[i][2], dockLocations[i][3], dockLocations[i][4], dockLocations[i][5]);
+      break;
+    }
+  }
+  RobotHasCommand = false;
 }
 
 //Function to calculate the disatance from the robot to a given target location, in the x,y and quaternion notation. Returns a float representing the lenght of the path.
@@ -234,7 +244,7 @@ void startNewCommand(robotPickupCommand command)
     if(command.source.compare(dockNames[i]) == 0)
     {
       distance = calcGoalDistance(dockLocations[i][0], dockLocations[i][1], dockLocations[i][2], dockLocations[i][3], dockLocations[i][4], dockLocations[i][5]);
-      ROS_INFO("Distance to goal %s: %f", dockNames[i].c_str(), distance);
+      ROS_INFO("Robot %i :Distance to goal %s: %f", (robotName.at(robotName.size() - 1)) - 48, dockNames[i].c_str(), distance);
       break;
     }
     else
@@ -283,13 +293,16 @@ void responseReceived(multirob_test::r2rpickupresponse response)
   //@TODO:This is a bad implementation, find a better way to do it. Something breaks, because two robots execute a command for a single robot, based on the distance. Let's convert the distance from qa float to an int, with a known multiplier.
   if(robotResponses[1].robot == 1 && robotResponses[2].robot == 2 && robotResponses[3].robot == 3 && robotResponses[4].robot == 4)
   {
+    ROS_INFO("Robot %i :stage 1 ",(robotName.at(robotName.size() - 1)) - 48);
     if(robotResponses[int(robotName.at(robotName.size() - 1)) - 48].canDo)
     {
       for(int i=0; i<numberOfRobots+1; i++)
       {
-        if(robotResponses[i].robot == int(robotName.at(robotName.size() - 1)) - 48)
+        ROS_INFO("Robot %i :stage 2 ",(robotName.at(robotName.size() - 1)) - 48);
+        if(robotResponses[i].robot == int(robotName.at(robotName.size() - 1)) - 48) // TODO Robot can compare with three robots and have the shortest distance. so runCommand = true, but if he is last to check himself he will go through if statement and the runCommand will still be false.
         {
           runCommand = false;
+	  ROS_INFO("Robot %i : its me ",(robotName.at(robotName.size() - 1)) - 48);
         }
         else
         {
@@ -298,13 +311,15 @@ void responseReceived(multirob_test::r2rpickupresponse response)
             if(robotResponses[int(robotName.at(robotName.size() - 1)) - 48].distance < robotResponses[i].distance)
             {
               runCommand = true;
+	      ROS_INFO("Robot %i : compare = true ",(robotName.at(robotName.size() - 1)) - 48);	     
             }
             else
             {
               runCommand = false;
+	      ROS_INFO("Robot %i : compare = false",(robotName.at(robotName.size() - 1)) - 48);
             }
           }
-          else
+          else //TODO if the robot has compared with two robots and doesnt have the shortest distance. If the last robot has canDo = false that is will go throught this and the runCommand will stil be true and the robot will execute the command
           {
             runCommand = true;
           }
@@ -313,6 +328,7 @@ void responseReceived(multirob_test::r2rpickupresponse response)
       if(runCommand)
       {
         executeCommand(robotResponses[int(robotName.at(robotName.size() - 1)) - 48].pickup.source, robotResponses[int(robotName.at(robotName.size() - 1)) - 48].pickup.destination);
+        ROS_INFO("Execute Command");
       }
     }
     for(int i=0; i<numberOfRobots; i++)

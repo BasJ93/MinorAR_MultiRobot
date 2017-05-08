@@ -9,39 +9,13 @@
   <arg name="urdf_file" default="$(find xacro)/xacro.py '$(find turtlebot_description)/robots/$(arg base)_$(arg stacks)_$(arg 3d_sensor).urdf.xacro'"/>
   <param name="robot_description" command="$(arg urdf_file)" />
 
-  <!-- BEGIN ROBOT 1-->
-  <group ns="robot1">
-    <arg name="robot_name" value="robot1"/>
-    <include file="$(find multirob_test)/includes/agent.launch.xml" >
-    <arg name="initial_pose_x" value="0" />
-    <arg name="initial_pose_y" value="0" />
-    <arg name="initial_pose_z" value="0" />
-    <arg name="initial_pose_yaw" value="0" />
-    <arg name="robot_name" value="$(arg robot_name)"/>
-    <arg name="sim" value="$(arg sim)" />
-    </include>
-  </group>
-
-  <group unless="$(arg mapping)">
-    <!-- BEGIN ROBOT 2-->
-    <group ns="robot2">
-      <arg name="robot_name" value="robot2"/>
-      <include file="$(find multirob_test)/includes/agent.launch.xml" >
-      <arg name="initial_pose_x" value="1" />
-      <arg name="initial_pose_y" value="0" />
-      <arg name="initial_pose_z" value="0" />
-      <arg name="initial_pose_yaw" value="3.1415926" />
-      <arg name="robot_name" value="$(arg robot_name)"/>
-      <arg name="sim" value="$(arg sim)" />
-      </include>
-    </group>
-
-    <!-- BEGIN ROBOT 3-->
-    <group ns="robot3">
-      <arg name="robot_name" value="robot3"/>
+  <group if="$(arg sim)">
+    <!-- BEGIN ROBOT 1-->
+    <group ns="robot1">
+      <arg name="robot_name" value="robot1"/>
       <include file="$(find multirob_test)/includes/agent.launch.xml" >
       <arg name="initial_pose_x" value="0" />
-      <arg name="initial_pose_y" value="1" />
+      <arg name="initial_pose_y" value="0" />
       <arg name="initial_pose_z" value="0" />
       <arg name="initial_pose_yaw" value="0" />
       <arg name="robot_name" value="$(arg robot_name)"/>
@@ -49,16 +23,82 @@
       </include>
     </group>
 
-    <!-- BEGIN ROBOT 4-->
+    <group unless="$(arg mapping)">
+      <!-- BEGIN ROBOT 2-->
+      <group ns="robot2">
+        <arg name="robot_name" value="robot2"/>
+        <include file="$(find multirob_test)/includes/agent.launch.xml" >
+        <arg name="initial_pose_x" value="1" />
+        <arg name="initial_pose_y" value="0" />
+        <arg name="initial_pose_z" value="0" />
+        <arg name="initial_pose_yaw" value="3.1415926" />
+        <arg name="robot_name" value="$(arg robot_name)"/>
+        <arg name="sim" value="$(arg sim)" />
+        </include>
+      </group>
+
+      <!-- BEGIN ROBOT 3-->
+      <group ns="robot3">
+        <arg name="robot_name" value="robot3"/>
+        <include file="$(find multirob_test)/includes/agent.launch.xml" >
+        <arg name="initial_pose_x" value="0" />
+        <arg name="initial_pose_y" value="1" />
+        <arg name="initial_pose_z" value="0" />
+        <arg name="initial_pose_yaw" value="0" />
+        <arg name="robot_name" value="$(arg robot_name)"/>
+        <arg name="sim" value="$(arg sim)" />
+        </include>
+      </group>
+
+      <!-- BEGIN ROBOT 4-->
+      <group ns="robot4">
+        <arg name="robot_name" value="robot4"/>
+        <include file="$(find multirob_test)/includes/agent.launch.xml" >
+        <arg name="initial_pose_x" value="1" />
+        <arg name="initial_pose_y" value="1" />
+        <arg name="initial_pose_z" value="0" />
+        <arg name="initial_pose_yaw" value="-3.1415926" />
+        <arg name="robot_name" value="$(arg robot_name)"/>
+        <arg name="sim" value="$(arg sim)" />
+        </include>
+      </group>
+    </group>
+  </group>
+
+  <group unless="$(arg sim)">
+    <node name="master_discovery" pkg="master_discovery_fkie" type="master_discovery">
+      <param name="mcast_group" value="224.0.0.1" />
+    </node>
+
+    <!-- BEGIN ROBOT 1-->
+    <group ns="robot1">
+      <arg name="robot_name" value="robot1"/>
+      <include file="$(find multirob_test)/includes/sync.launch.xml" >
+        <arg name="host" value="einstein"/>
+      </include>
+    </group>
+
+   <!-- BEGIN ROBOT 2-->
+    <group ns="robot2">
+      <arg name="robot_name" value="robot2"/>
+      <include file="$(find multirob_test)/includes/sync.launch.xml" >
+        <arg name="host" value="tesla"/>
+      </include>
+    </group>
+
+   <!-- BEGIN ROBOT 3-->
+    <group ns="robot3">
+      <arg name="robot_name" value="robot3"/>
+      <include file="$(find multirob_test)/includes/sync.launch.xml" >
+        <arg name="host" value="pythagoras"/>
+      </include>
+    </group>
+
+   <!-- BEGIN ROBOT 4-->
     <group ns="robot4">
       <arg name="robot_name" value="robot4"/>
-      <include file="$(find multirob_test)/includes/agent.launch.xml" >
-      <arg name="initial_pose_x" value="1" />
-      <arg name="initial_pose_y" value="1" />
-      <arg name="initial_pose_z" value="0" />
-      <arg name="initial_pose_yaw" value="-3.1415926" />
-      <arg name="robot_name" value="$(arg robot_name)"/>
-      <arg name="sim" value="$(arg sim)" />
+      <include file="$(find multirob_test)/includes/sync.launch.xml" >
+        <arg name="host" value="newton"/>
       </include>
     </group>
   </group>
