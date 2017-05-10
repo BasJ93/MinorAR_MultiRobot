@@ -50,7 +50,10 @@ multirob_test::r2rpickupresponse robotResponses[10];
 
 volatile bool RobotHasCommand = false;
 
-std::string dockNames[3] = {"A", "B", "C"};
+//Change this to be vectors std::vector<std::string> words1 {"the", "frogurt", "is", "also", "cursed"};
+std::vector<std::string> dockNames {"A", "B", "C", "D", "E"};
+//std::string dockNames[3] = {"A", "B", "C"};
+//Design a struct to store the data for a location, then build a vector with this struct.
 float dockLocations[3][6] = {{-5.162, -5.257, 0.000, 0.000, 0.998, -0.066}, {-3.219, -2.244, 0.000, -0.000, -0.607, 0.794}, {8.782, -5.734, -0.000, -0.000, 0.803, 0.595}};
 
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
@@ -279,6 +282,7 @@ void startNewCommand(robotPickupCommand command)
   //RobotHasCommand = true;
 }
 
+//Change the checking to use a vector. Sort by a weight, e.g. distance, or space, or canDo
 void responseReceived(multirob_test::r2rpickupresponse response)
 {
   robotResponses[response.robot].robot = response.robot;
