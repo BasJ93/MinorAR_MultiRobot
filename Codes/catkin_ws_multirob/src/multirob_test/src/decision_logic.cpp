@@ -50,7 +50,10 @@ multirob_test::r2rpickupresponse robotResponses[10];
 
 volatile bool RobotHasCommand = false;
 
-std::string dockNames[3] = {"A", "B", "C"};
+//Change this to be vectors std::vector<std::string> words1 {"the", "frogurt", "is", "also", "cursed"};
+std::vector<std::string> dockNames {"A", "B", "C", "D", "E"};
+//std::string dockNames[3] = {"A", "B", "C"};
+//Design a struct to store the data for a location, then build a vector with this struct.
 float dockLocations[3][6] = {{-5.162, -5.257, 0.000, 0.000, 0.998, -0.066}, {-3.219, -2.244, 0.000, -0.000, -0.607, 0.794}, {8.782, -5.734, -0.000, -0.000, 0.803, 0.595}};
 
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
@@ -97,7 +100,7 @@ void moveToLocation(float x, float y, float qx, float qy, float qz, float qw)
 
 void executeCommand(std::string source, std::string destination)
 {
-  ROS_INFO("%s will execute the command.", robotName.c_str());
+  ROS_INFO(" %s will execute the command.", robotName.c_str());
   RobotHasCommand = true;
   
   for(int i=0; i<3; i++)
@@ -119,7 +122,8 @@ void executeCommand(std::string source, std::string destination)
   RobotHasCommand = false;
 }
 
-//Function to calculate the disatance from the robot to a given target location, in the x,y and quaternion notation. Returns a float representing the lenght of the path.
+//Function to calculate the disatance from the robot to a given target location, in the x,y and quaternion notation. Returns a float representing the lenght of the path.\
+//TODO the distance to the goal is -1 so something goes wrong with calculating the distance.
 float calcGoalDistance(float x, float y, float qx, float qy, float qz, float qw)
 {
   //Create a nodehandle and attach the make_plan client to the node.
@@ -278,6 +282,7 @@ void startNewCommand(robotPickupCommand command)
   //RobotHasCommand = true;
 }
 
+//Change the checking to use a vector. Sort by a weight, e.g. distance, or space, or canDo
 void responseReceived(multirob_test::r2rpickupresponse response)
 {
   robotResponses[response.robot].robot = response.robot;
@@ -288,21 +293,21 @@ void responseReceived(multirob_test::r2rpickupresponse response)
   robotResponses[response.robot].distance = response.distance;
   robotResponses[response.robot].space = response.space;
 
-  bool runCommand = false;
+  bool runCommand = true;
 
-  //@TODO:This is a bad implementation, find a better way to do it. Something breaks, because two robots execute a command for a single robot, based on the distance. Let's convert the distance from qa float to an int, with a known multiplier.
+  //@TODO:Problem is that sometimes the robots start comparing without having all the data.
   if(robotResponses[1].robot == 1 && robotResponses[2].robot == 2 && robotResponses[3].robot == 3 && robotResponses[4].robot == 4)
   {
-    ROS_INFO("Robot %i :stage 1 ",(robotName.at(robotName.size() - 1)) - 48);
+    //ROS_INFO("Robot %i :stage 1 ",(robotName.at(robotName.size() - 1)) - 48);
     if(robotResponses[int(robotName.at(robotName.size() - 1)) - 48].canDo)
     {
       for(int i=0; i<numberOfRobots+1; i++)
       {
-        ROS_INFO("Robot %i :stage 2 ",(robotName.at(robotName.size() - 1)) - 48);
-        if(robotResponses[i].robot == int(robotName.at(robotName.size() - 1)) - 48) // TODO Robot can compare with three robots and have the shortest distance. so runCommand = true, but if he is last to check himself he will go through if statement and the runCommand will still be false.
+        //ROS_INFO("Robot %i :stage 2 ",(robotName.at(robotName.size() - 1)) - 48);
+        if(robotResponses[i].robot == int(robotName.at(robotName.size() - 1)) - 48) 
         {
-          runCommand = false;
-	  ROS_INFO("Robot %i : its me ",(robotName.at(robotName.size() - 1)) - 48);
+          runCommand = runCommand;
+	  //ROS_INFO("Robot %i runCommand %s: its me don't compare : ",(robotName.at(robotName.size() - 1)) - 48, runCommand ? "true" : "false");
         }
         else
         {
@@ -310,18 +315,19 @@ void responseReceived(multirob_test::r2rpickupresponse response)
           {
             if(robotResponses[int(robotName.at(robotName.size() - 1)) - 48].distance < robotResponses[i].distance)
             {
-              runCommand = true;
-	      ROS_INFO("Robot %i : compare = true ",(robotName.at(robotName.size() - 1)) - 48);	     
+              runCommand = runCommand;
+	      //ROS_INFO("Robot %i runCommand %s: compare = true ",(robotName.at(robotName.size() - 1)) - 48, runCommand ? "true" : "false");	     
             }
             else
             {
               runCommand = false;
-	      ROS_INFO("Robot %i : compare = false",(robotName.at(robotName.size() - 1)) - 48);
+	      //ROS_INFO("Robot %i runCommand %s: compare = false",(robotName.at(robotName.size() - 1)) - 48, runCommand ? "true" : "false");
             }
           }
-          else //TODO if the robot has compared with two robots and doesnt have the shortest distance. If the last robot has canDo = false that is will go throught this and the runCommand will stil be true and the robot will execute the command
+          else 
           {
-            runCommand = true;
+            runCommand = runCommand;
+	    //ROS_INFO("Robot %i runCommand %s: otherrobot.cando = false",(robotName.at(robotName.size() - 1)) - 48, runCommand ? "true" : "false");
           }
         }
       }
