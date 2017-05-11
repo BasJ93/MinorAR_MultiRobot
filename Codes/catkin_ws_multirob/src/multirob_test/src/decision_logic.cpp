@@ -54,7 +54,7 @@ volatile bool RobotHasCommand = false;
 std::vector<std::string> dockNames {"A", "B", "C", "D", "E"};
 //std::string dockNames[3] = {"A", "B", "C"};
 //Design a struct to store the data for a location, then build a vector with this struct.
-float dockLocations[3][6] = {{-5.162, -5.257, 0.000, 0.000, 0.998, -0.066}, {-3.219, -2.244, 0.000, -0.000, -0.607, 0.794}, {8.782, -5.734, -0.000, -0.000, 0.803, 0.595}};
+float dockLocations[5][6] = {{-5.162, -5.257, 0.000, 0.000, 0.998, -0.066}, {-3.219, -2.244, 0.000, -0.000, -0.607, 0.794}, {8.782, -5.734, -0.000, -0.000, 0.803, 0.595}, {6.000, 6.000, -0.000, -0.000, 0.803, 0.595}, {-6.000, 6.000, -0.000, -0.000, 0.803, 0.595}};
 
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
 
@@ -103,7 +103,7 @@ void executeCommand(std::string source, std::string destination)
   ROS_INFO(" %s will execute the command.", robotName.c_str());
   RobotHasCommand = true;
   
-  for(int i=0; i<3; i++)
+  for(int i=0; i<5; i++)
   {
     if(source.compare(dockNames[i]) == 0)
     {
@@ -111,7 +111,7 @@ void executeCommand(std::string source, std::string destination)
       break;
     }
   }
-  for(int i=0; i<3; i++)
+  for(int i=0; i<5; i++)
   {
     if(destination.compare(dockNames[i]) == 0)
     {
@@ -123,7 +123,7 @@ void executeCommand(std::string source, std::string destination)
 }
 
 //Function to calculate the disatance from the robot to a given target location, in the x,y and quaternion notation. Returns a float representing the lenght of the path.\
-//TODO the distance to the goal is -1 so something goes wrong with calculating the distance.
+//TODO the distance to the goal is sometimes closes because the robot isn't sure of its position, this is a problem on small scale but on big scale this would not be a problem. 
 float calcGoalDistance(float x, float y, float qx, float qy, float qz, float qw)
 {
   //Create a nodehandle and attach the make_plan client to the node.
@@ -174,7 +174,7 @@ float calcGoalDistance(float x, float y, float qx, float qy, float qz, float qw)
       if(plan.response.plan.poses.size())
       {
         ROS_INFO("Path has %lu points.", plan.response.plan.poses.size());
-        float pathLenght;
+        float pathLenght = 0;
         for (int i=0; i<plan.response.plan.poses.size(); i++)
         {
           float xP = plan.response.plan.poses[i].pose.position.x - plan.response.plan.poses[i+1].pose.position.x;
@@ -193,6 +193,7 @@ float calcGoalDistance(float x, float y, float qx, float qy, float qz, float qw)
           ROS_INFO("Invalid path lenght.");
           return -1;
         }
+	//return pathLenght;
       }
       else
       {
@@ -243,7 +244,7 @@ void startNewCommand(robotPickupCommand command)
   
   float distance;
 //Tell all other robots that the command can be executed by the this robot
-  for(int i=0; i<3; i++)
+  for(int i=0; i<5; i++)
   {
     if(command.source.compare(dockNames[i]) == 0)
     {
