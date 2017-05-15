@@ -329,6 +329,12 @@ ar_por_BINARY_DIR:STATIC=/home/bas/catkin_ws_multirob/build/ar_por
 //Value Computed by CMake
 ar_por_SOURCE_DIR:STATIC=/home/bas/catkin_ws_multirob/src/ar_por
 
+//Value Computed by CMake
+ar_vsp_BINARY_DIR:STATIC=/home/bas/catkin_ws_multirob/build/ar_vsp
+
+//Value Computed by CMake
+ar_vsp_SOURCE_DIR:STATIC=/home/bas/catkin_ws_multirob/src/ar_vsp
+
 //The directory containing a CMake configuration file for bond.
 bond_DIR:PATH=/opt/ros/indigo/share/bond/cmake
 
@@ -346,6 +352,9 @@ cmake_modules_DIR:PATH=/opt/ros/indigo/share/cmake_modules/cmake
 
 //The directory containing a CMake configuration file for cpp_common.
 cpp_common_DIR:PATH=/opt/ros/indigo/share/cpp_common/cmake
+
+//The directory containing a CMake configuration file for cv_bridge.
+cv_bridge_DIR:PATH=/opt/ros/indigo/share/cv_bridge/cmake
 
 //Value Computed by CMake
 descartes_BINARY_DIR:STATIC=/home/bas/catkin_ws_multirob/build/descartes/descartes
@@ -778,7 +787,7 @@ CMAKE_MODULE_LINKER_FLAGS_RELWITHDEBINFO-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_NM
 CMAKE_NM-ADVANCED:INTERNAL=1
 //number of local generators
-CMAKE_NUMBER_OF_LOCAL_GENERATORS:INTERNAL=13
+CMAKE_NUMBER_OF_LOCAL_GENERATORS:INTERNAL=14
 //ADVANCED property for variable: CMAKE_OBJCOPY
 CMAKE_OBJCOPY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: CMAKE_OBJDUMP
