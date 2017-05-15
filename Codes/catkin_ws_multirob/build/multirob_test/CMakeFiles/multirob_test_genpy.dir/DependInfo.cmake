@@ -17,6 +17,8 @@ SET(CMAKE_TARGET_LINKED_INFO_FILES
 # The include file search paths:
 SET(CMAKE_C_TARGET_INCLUDE_PATH
   "/home/bas/catkin_ws_multirob/devel/include"
+  "/home/bas/catkin_ws_multirob/src/multirob_test/include"
+  "/opt/ros/indigo/include"
   )
 SET(CMAKE_CXX_TARGET_INCLUDE_PATH ${CMAKE_C_TARGET_INCLUDE_PATH})
 SET(CMAKE_Fortran_TARGET_INCLUDE_PATH ${CMAKE_C_TARGET_INCLUDE_PATH})

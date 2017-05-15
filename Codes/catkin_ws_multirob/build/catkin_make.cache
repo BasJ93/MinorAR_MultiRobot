@@ -1,2 +1,2 @@
-ar_hwa:ar_por:descartes/descartes:descartes/descartes_core:descartes/descartes_moveit:descartes/descartes_planner:descartes/descartes_trajectory:descartes/descartes_utilities:descartes_tutorials/descartes_tutorials:micros_swarm_framework:multirob_test
+ar_hwa:ar_por:ar_vsp:descartes/descartes:descartes/descartes_core:descartes/descartes_moveit:descartes/descartes_planner:descartes/descartes_trajectory:descartes/descartes_utilities:descartes_tutorials/descartes_tutorials:micros_swarm_framework:multirob_test
 -DCATKIN_DEVEL_PREFIX=/home/bas/catkin_ws_multirob/devel -DCMAKE_INSTALL_PREFIX=/home/bas/catkin_ws_multirob/install -G Unix Makefiles

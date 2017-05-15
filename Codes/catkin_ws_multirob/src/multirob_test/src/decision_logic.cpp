@@ -22,6 +22,7 @@
 
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/Quaternion.h>
+#include <geometry_msgs/Pose.h>
 
 //Maybe revise msg to fit to all commands, not just pickup
 #include <multirob_test/cmdPickup.h>
@@ -45,16 +46,19 @@ struct robotPickupCommand {
 //Keep a records of the previous/active pickup command
 volatile robotPickupCommand previousPickupCommand;
 
+std::vector<multirob_test::r2rpickupresponse> robotResponses;
 //volatile
-multirob_test::r2rpickupresponse robotResponses[10];
+//multirob_test::r2rpickupresponse robotResponses[10];
 
 volatile bool RobotHasCommand = false;
 
 //Change this to be vectors std::vector<std::string> words1 {"the", "frogurt", "is", "also", "cursed"};
-std::vector<std::string> dockNames {"A", "B", "C", "D", "E"};
+std::vector<std::string> dockNames;// {"A", "B", "C", "D", "E"};
 //std::string dockNames[3] = {"A", "B", "C"};
 //Design a struct to store the data for a location, then build a vector with this struct.
-float dockLocations[5][6] = {{-5.162, -5.257, 0.000, 0.000, 0.998, -0.066}, {-3.219, -2.244, 0.000, -0.000, -0.607, 0.794}, {8.782, -5.734, -0.000, -0.000, 0.803, 0.595}, {6.000, 6.000, -0.000, -0.000, 0.803, 0.595}, {-6.000, 6.000, -0.000, -0.000, 0.803, 0.595}};
+std::vector<geometry_msgs::Pose> dockLocations;
+
+//float dockLocations[5][6] = {{-5.162, -5.257, 0.000, 0.000, 0.998, -0.066}, {-3.219, -2.244, 0.000, -0.000, -0.607, 0.794}, {8.782, -5.734, -0.000, -0.000, 0.803, 0.595}, {6.000, 6.000, -0.000, -0.000, 0.803, 0.595}, {-6.000, 6.000, -0.000, -0.000, 0.803, 0.595}};
 
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
 
@@ -65,8 +69,13 @@ int numberOfRobots;
 int storageSize;
 bool sim;
 
+bool sortByDistance(multirob_test::r2rpickupresponse response1, multirob_test::r2rpickupresponse response2)
+{
+  return response1.distance < response2.distance;
+}
+
 //Function to send the robot to a location. Pass the locatation as an x,y coordinate and a rotation in quaternion notation.
-void moveToLocation(float x, float y, float qx, float qy, float qz, float qw)
+void moveToLocation(geometry_msgs::Pose pose)//float x, float y, float qx, float qy, float qz, float qw)
 {
   //Create an actionlib client for move_base. Using this client a goal can be assigned to move_base.
   MoveBaseClient ac("move_base", true);
@@ -81,14 +90,15 @@ void moveToLocation(float x, float y, float qx, float qy, float qz, float qw)
   goal.target_pose.header.frame_id = "/map";
   goal.target_pose.header.stamp = ros::Time::now();
 
-  goal.target_pose.pose.position.x = x;
+  goal.target_pose.pose = pose;
+/*  .position.x = x;
   goal.target_pose.pose.position.y = y;
 
   goal.target_pose.pose.orientation.x = qx;
   goal.target_pose.pose.orientation.y = qy;
   goal.target_pose.pose.orientation.z = qz;
   goal.target_pose.pose.orientation.w = qw;
-
+*/
   if(sim)
   {
     //Send the goal to move_base
@@ -107,7 +117,7 @@ void executeCommand(std::string source, std::string destination)
   {
     if(source.compare(dockNames[i]) == 0)
     {
-      moveToLocation(dockLocations[i][0], dockLocations[i][1], dockLocations[i][2], dockLocations[i][3], dockLocations[i][4], dockLocations[i][5]);
+      moveToLocation(dockLocations[i]);//[0], dockLocations[i][1], dockLocations[i][2], dockLocations[i][3], dockLocations[i][4], dockLocations[i][5]);
       break;
     }
   }
@@ -115,7 +125,7 @@ void executeCommand(std::string source, std::string destination)
   {
     if(destination.compare(dockNames[i]) == 0)
     {
-      moveToLocation(dockLocations[i][0], dockLocations[i][1], dockLocations[i][2], dockLocations[i][3], dockLocations[i][4], dockLocations[i][5]);
+      moveToLocation(dockLocations[i]);//[0], dockLocations[i][1], dockLocations[i][2], dockLocations[i][3], dockLocations[i][4], dockLocations[i][5]);
       break;
     }
   }
@@ -124,7 +134,7 @@ void executeCommand(std::string source, std::string destination)
 
 //Function to calculate the disatance from the robot to a given target location, in the x,y and quaternion notation. Returns a float representing the lenght of the path.\
 //TODO the distance to the goal is sometimes closes because the robot isn't sure of its position, this is a problem on small scale but on big scale this would not be a problem. 
-float calcGoalDistance(float x, float y, float qx, float qy, float qz, float qw)
+float calcGoalDistance(geometry_msgs::Pose pose)
 {
   //Create a nodehandle and attach the make_plan client to the node.
   ros::NodeHandle n;
@@ -159,13 +169,14 @@ float calcGoalDistance(float x, float y, float qx, float qy, float qz, float qw)
 
     plan.request.goal.header.frame_id = "/map";
     plan.request.goal.header.stamp = ros::Time::now();
-    plan.request.goal.pose.position.x = x;
+    plan.request.goal.pose = pose;
+/*    .position.x = x;
     plan.request.goal.pose.position.y = y;
     plan.request.goal.pose.orientation.x = qx;
     plan.request.goal.pose.orientation.y = qy;
     plan.request.goal.pose.orientation.z = qz;
     plan.request.goal.pose.orientation.w = qw;
-
+*/
     plan.request.tolerance = 0.10;
 
     if (client.call(plan))
@@ -248,7 +259,7 @@ void startNewCommand(robotPickupCommand command)
   {
     if(command.source.compare(dockNames[i]) == 0)
     {
-      distance = calcGoalDistance(dockLocations[i][0], dockLocations[i][1], dockLocations[i][2], dockLocations[i][3], dockLocations[i][4], dockLocations[i][5]);
+      distance = calcGoalDistance(dockLocations[i]);//dockLocations[i][0], dockLocations[i][1], dockLocations[i][2], dockLocations[i][3], dockLocations[i][4], dockLocations[i][5]);
       ROS_INFO("Robot %i :Distance to goal %s: %f", (robotName.at(robotName.size() - 1)) - 48, dockNames[i].c_str(), distance);
       break;
     }
@@ -286,16 +297,26 @@ void startNewCommand(robotPickupCommand command)
 //Change the checking to use a vector. Sort by a weight, e.g. distance, or space, or canDo
 void responseReceived(multirob_test::r2rpickupresponse response)
 {
-  robotResponses[response.robot].robot = response.robot;
+/*  robotResponses[response.robot].robot = response.robot;
   robotResponses[response.robot].pickup.source = response.pickup.source;
   robotResponses[response.robot].pickup.destination = response.pickup.destination;
   robotResponses[response.robot].pickup.amount = response.pickup.amount;
   robotResponses[response.robot].canDo = response.canDo;
   robotResponses[response.robot].distance = response.distance;
   robotResponses[response.robot].space = response.space;
+*/
 
+  robotResponses.push_back(response);
   bool runCommand = true;
 
+  std::sort(robotResponses.begin(), robotResponses.end(), sortByDistance);
+
+  for(int i=0; i<robotResponses.size(); i++)
+  {
+    ROS_INFO("Robot %i distance %d", robotResponses[i].robot, robotResponses[i].distance);
+  }
+
+/*
   //@TODO:Problem is that sometimes the robots start comparing without having all the data.
   if(robotResponses[1].robot == 1 && robotResponses[2].robot == 2 && robotResponses[3].robot == 3 && robotResponses[4].robot == 4)
   {
@@ -342,7 +363,7 @@ void responseReceived(multirob_test::r2rpickupresponse response)
     {
       robotResponses[i].robot = 0;
     }
-  }
+  }*/
 }
 
 //Callback function when a new command msg is received
@@ -411,6 +432,53 @@ int main(int argc, char** argv)
 
   node.getParam("robots_number", numberOfRobots);
   node.getParam("storage_size", storageSize);
+
+  dockNames.push_back("A");
+  geometry_msgs::Pose pose;
+  pose.position.x = -5.162;
+  pose.position.y = -5.257;
+  pose.orientation.x = 0.000;
+  pose.orientation.y = 0.000;
+  pose.orientation.z = 0.998;
+  pose.orientation.w = -0.066;
+  dockLocations.push_back(pose);
+
+  dockNames.push_back("B");
+  pose.position.x = -3.219;
+  pose.position.y = -2.244;
+  pose.orientation.x = 0.000;
+  pose.orientation.y = -0.000;
+  pose.orientation.z = -0.607;
+  pose.orientation.w = 0.794;
+  dockLocations.push_back(pose);
+
+  dockNames.push_back("C");
+  pose.position.x = 8.782;
+  pose.position.y = -5.734;
+  pose.orientation.x = -0.000;
+  pose.orientation.y = -0.000;
+  pose.orientation.z = 0.803;
+  pose.orientation.w = 0.595;
+  dockLocations.push_back(pose);
+
+  dockNames.push_back("D");
+  pose.position.x = 6.000;
+  pose.position.y = 6.000;
+  pose.orientation.x = -0.000;
+  pose.orientation.y = -0.000;
+  pose.orientation.z = 0.803;
+  pose.orientation.w = 0.595;
+  dockLocations.push_back(pose);
+
+  dockNames.push_back("E");
+  pose.position.x = -6.000;
+  pose.position.y = 6.000;
+  pose.orientation.x = -0.000;
+  pose.orientation.y = -0.000;
+  pose.orientation.z = 0.803;
+  pose.orientation.w = 0.595;
+  dockLocations.push_back(pose);
+
   ros::spin();
 
   return 0;
