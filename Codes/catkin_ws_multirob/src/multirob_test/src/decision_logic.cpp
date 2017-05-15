@@ -306,29 +306,28 @@ void responseReceived(multirob_test::r2rpickupresponse response)
 
   if(robotResponses.size() == numberOfRobots)
   {
-    std::sort(robotResponses.begin(), robotResponses.end(), sortByDistance);
+    std::vector<multirob_test::r2rpickupresponse> robotResponsescanDo;
+    for(int i=0; i<robotResponses.size(); i++)  
+    {
+      if (robotResponses[i].canDo)
+      {
+        robotResponsescanDo.push_back(robotResponses[i]);
+      }
+    }
+          
+    std::sort(robotResponsescanDo.begin(), robotResponsescanDo.end(), sortByDistance);
 
-    for(int i=0; i<robotResponses.size(); i++)
+    for(int i=0; i<robotResponsescanDo.size(); i++)
     {
-      ROS_INFO("Robot %i distance %d", robotResponses[i].robot, robotResponses[i].distance);
+      ROS_INFO("Robot %i distance to goal %d", robotResponsescanDo[i].robot, robotResponsescanDo[i].distance);
     }
-    if(robotResponses[0].robot == int(robotName.at(robotName.size() - 1) - 48))
+    if(robotResponsescanDo[0].robot == int(robotName.at(robotName.size() - 1) - 48))
     {
-      if (robotResponses[0].canDo)
-      {
-        runCommand = true;
-      }
-      else
-      {
-        runCommand = false;
-      }
-    }
-    else
-    {
-      runCommand = false;
+      runCommand = true;
     }
     
     robotResponses.clear();
+    robotResponsescanDo.clear();
   }
   if(runCommand)
   {
