@@ -1,5 +1,5 @@
 /****************************************/
-/*  Bas Janssen 			*/
+/*  Bas Janssen 			                  */
 /*  Dimitri Waard                       */
 /*  Fontys 2017                         */
 /****************************************/
@@ -99,7 +99,8 @@ void executeCommand(std::string source, std::string destination)
 {
   ROS_INFO(" %s will execute the command.", robotName.c_str());
   RobotHasCommand = true;
-  
+  //numberOfRobots = numberOfRobots -1;
+  //ROS_INFO("numberOfRobots before executing command %u",numberOfRobots);
   for(int i=0; i<5; i++)
   {
     if(source.compare(dockNames[i]) == 0)
@@ -117,6 +118,8 @@ void executeCommand(std::string source, std::string destination)
     }
   }
   RobotHasCommand = false;
+  //numberOfRobots = numberOfRobots + 1;
+  //ROS_INFO("numberOfRobots after executing command %u",numberOfRobots);
 }
 
 //Function to calculate the disatance from the robot to a given target location, in the x,y and quaternion notation. Returns a float representing the lenght of the path.\
@@ -202,12 +205,33 @@ float calcGoalDistance(geometry_msgs::Pose pose)
   }
 }
 
+//TODO it doesn't allow the void to use the parameters amount and storageSize. 
 int checkInventory(void)
 {
   //Normaly we would check the I/O's representing the loaded products, but we currently have a simulation.
+  int storageSizeUsed;
   if(sim)
   {
-    return storageSize;
+    if(storageSize < amount)
+    {
+    storageSizeUsed = storageSize;
+    amount = amount - storageSize;
+    ROS_INFO("storageSizeUsed %u", storageSizeUsed);
+    ROS_INFO("Amountleft %u", storageSizeUsed);
+    return storageSizeUsed;
+    }
+    if(storageSize = amount)
+    {
+    storageSizeUsed = storageSize;
+    ROS_INFO("storageSizeUsed %u", storageSizeUsed);
+    return storageSizeUsed;
+    }
+    else
+    {
+    storageSizeUsed = storageSize - amount;
+    ROS_INFO("storageSizeUsed %u", storageSizeUsed);
+    return storageSizeUsed;
+    }
   }
   else
   {
@@ -303,9 +327,10 @@ void responseReceived(multirob_test::r2rpickupresponse response)
   robotResponses.push_back(response);
   bool runCommand = false;
 
-
+  //TODO If a robot is still executing a command while a new command is send, the robot can not calculate the distance between him and the goal. Therefore it will give a distance of -1. The program works like we want it to but for later application we need the robot to give a distance instead of -1.
   if(robotResponses.size() == numberOfRobots)
   {
+    //ROS_INFO("numberOfRobots %u",numberOfRobots);
     std::vector<multirob_test::r2rpickupresponse> robotResponsescanDo;
     for(int i=0; i<robotResponses.size(); i++)  
     {
@@ -331,7 +356,8 @@ void responseReceived(multirob_test::r2rpickupresponse response)
   }
   if(runCommand)
   {
-    executeCommand(robotResponses[0].pickup.source, robotResponses[0].pickup.destination);
+    boost::thread t{executeCommand, robotResponses[0].pickup.source, robotResponses[0].pickup.destination};//, arg1, arg2}; //Add values to pass
+    //executeCommand(robotResponses[0].pickup.source, robotResponses[0].pickup.destination);
     ROS_INFO("Execute Command");
   }
 }
@@ -353,6 +379,7 @@ void commandReceived(multirob_test::cmdPickup command)
   {
     ROS_INFO("Go to Check");
     boost::thread t{checkWithExisting, newCommand};//, arg1, arg2}; //Add values to pass
+    t.detach();
   }
   else
   {
@@ -369,9 +396,9 @@ int main(int argc, char** argv)
   ros::NodeHandle node;
   ros::NodeHandle nh("~");
 
-  ros::Subscriber pickup_command = node.subscribe("/pickup_command", 1, commandReceived);
+  ros::Subscriber pickup_command = node.subscribe("/pickup_command", 10, commandReceived);
   robotComms = node.advertise<multirob_test::r2rpickupresponse>( "/pickup_responses", 0 );
-  ros::Subscriber pick_responses = node.subscribe("/pickup_responses", 1, responseReceived);
+  ros::Subscriber pick_responses = node.subscribe("/pickup_responses", 10, responseReceived);
 
   listener = new(tf::TransformListener);
 
