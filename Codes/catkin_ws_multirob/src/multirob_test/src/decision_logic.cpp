@@ -206,7 +206,7 @@ float calcGoalDistance(geometry_msgs::Pose pose)
 }
 
 //TODO it doesn't allow the void to use the parameters amount and storageSize. 
-int checkInventory(void)
+int checkInventory(int amount)
 {
   //Normaly we would check the I/O's representing the loaded products, but we currently have a simulation.
   int storageSizeUsed;
@@ -214,24 +214,25 @@ int checkInventory(void)
   {
     if(storageSize < amount)
     {
-    storageSizeUsed = storageSize;
-    amount = amount - storageSize;
-    ROS_INFO("storageSizeUsed %u", storageSizeUsed);
-    ROS_INFO("Amountleft %u", storageSizeUsed);
-    return storageSizeUsed;
+      storageSizeUsed = storageSize;
+      amount = amount - storageSize;
+      ROS_INFO("storageSizeUsed %u", storageSizeUsed);
+      ROS_INFO("Amountleft %u", storageSizeUsed);
+      return storageSizeUsed;
     }
     if(storageSize = amount)
     {
-    storageSizeUsed = storageSize;
-    ROS_INFO("storageSizeUsed %u", storageSizeUsed);
-    return storageSizeUsed;
+      storageSizeUsed = storageSize;
+      ROS_INFO("storageSizeUsed %u", storageSizeUsed);
+      return storageSizeUsed;
     }
     else
     {
-    storageSizeUsed = storageSize - amount;
-    ROS_INFO("storageSizeUsed %u", storageSizeUsed);
-    return storageSizeUsed;
+      storageSizeUsed = storageSize - amount;
+      ROS_INFO("storageSizeUsed %u", storageSizeUsed);
+      return storageSizeUsed;
     }
+    //return storageSize;
   }
   else
   {
@@ -298,7 +299,7 @@ void startNewCommand(robotPickupCommand command)
     }
   }
 
-  int space = checkInventory();
+  int space = checkInventory(command.amount);
 
   multirob_test::r2rpickupresponse response;
   response.robot = int(robotName.at(robotName.size() - 1)) - 48;
