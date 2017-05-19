@@ -209,27 +209,27 @@ float calcGoalDistance(geometry_msgs::Pose pose)
 int checkInventory(int amount)
 {
   //Normaly we would check the I/O's representing the loaded products, but we currently have a simulation.
-  int storageSizeUsed;
+  int storageSizeUsed = 0;
   if(sim)
   {
     if(storageSize < amount)
     {
       storageSizeUsed = storageSize;
-      amount = amount - storageSize;
-      ROS_INFO("storageSizeUsed %u", storageSizeUsed);
-      ROS_INFO("Amountleft %u", storageSizeUsed);
+      //amount = amount - storageSize;
+      //ROS_INFO("storageSizeUsed %u", storageSizeUsed);
+      //ROS_INFO("Amountleft %u", amount);
       return storageSizeUsed;
     }
     if(storageSize = amount)
     {
       storageSizeUsed = storageSize;
-      ROS_INFO("storageSizeUsed %u", storageSizeUsed);
+      //ROS_INFO("storageSizeUsed %u", storageSizeUsed);
       return storageSizeUsed;
     }
     else
     {
       storageSizeUsed = storageSize - amount;
-      ROS_INFO("storageSizeUsed %u", storageSizeUsed);
+      //ROS_INFO("storageSizeUsed %u", storageSizeUsed);
       return storageSizeUsed;
     }
     //return storageSize;
@@ -238,6 +238,13 @@ int checkInventory(int amount)
   {
     return 0;
   }
+}
+
+int checkAmountLeft(int amount)
+{
+int amountLeft = 0;
+amountLeft = amount - storageSize;
+return amountLeft;
 }
 
 int sendToOtherRobots(multirob_test::r2rpickupresponse response)
@@ -331,7 +338,7 @@ void responseReceived(multirob_test::r2rpickupresponse response)
   //TODO If a robot is still executing a command while a new command is send, the robot can not calculate the distance between him and the goal. Therefore it will give a distance of -1. The program works like we want it to but for later application we need the robot to give a distance instead of -1.
   if(robotResponses.size() == numberOfRobots)
   {
-    //ROS_INFO("numberOfRobots %u",numberOfRobots);
+    //Get rid of the robots who are unable to execute the command and put them in a new vector
     std::vector<multirob_test::r2rpickupresponse> robotResponsescanDo;
     for(int i=0; i<robotResponses.size(); i++)  
     {
@@ -340,21 +347,88 @@ void responseReceived(multirob_test::r2rpickupresponse response)
         robotResponsescanDo.push_back(robotResponses[i]);
       }
     }
-          
+    //Sort the vector values from low to high       
     std::sort(robotResponsescanDo.begin(), robotResponsescanDo.end(), sortByDistance);
 
-    for(int i=0; i<robotResponsescanDo.size(); i++)
+    /*for(int i=0; i<robotResponsescanDo.size(); i++)
     {
       ROS_INFO("Robot %i distance to goal %d", robotResponsescanDo[i].robot, robotResponsescanDo[i].distance);
-    }
-    if(robotResponsescanDo[0].robot == int(robotName.at(robotName.size() - 1) - 48))
-    {
-      runCommand = true;
-    }
+    }*/
     
+    //TODO the program has to be written shorter and it has to be able to work with more than 4 robots. So it also has to check with the available robots
+    //Check how many robots are needed to transport the amount of products
+    int amountLeft = checkAmountLeft(response.pickup.amount);
+    ROS_INFO("amountLeft %u", amountLeft);
+    int limit = 0;
+    if (amountLeft <= 0)
+      {
+        if(robotResponsescanDo[0].robot == int(robotName.at(robotName.size() - 1) - 48))
+        {
+          runCommand = true;
+        }
+      }
+          
+    if (amountLeft > 0 && amountLeft <= 6)
+      {
+        if (robotResponsescanDo.size() >= 2)
+        {
+          limit = 2;
+        }
+        if (robotResponsescanDo.size() < 2)
+        {
+          limit = robotResponsescanDo.size();
+        }
+        for(int i =0; i<limit; i++)
+        {
+          if(robotResponsescanDo[i].robot == int(robotName.at(robotName.size() - 1) - 48))
+          {
+            runCommand = true;
+          }
+        }  
+      }
+     
+    if (amountLeft > 6 && amountLeft <=12)
+      {
+        if (robotResponsescanDo.size() >= 3)
+        {
+          limit = 3;
+        }
+        if (robotResponsescanDo.size() < 3)
+        {
+          limit = robotResponsescanDo.size();
+        }
+        for(int i = 0; i<limit; i++)
+        {
+         if(robotResponsescanDo[i].robot == int(robotName.at(robotName.size() - 1) - 48))
+          {
+            runCommand = true;
+          }
+        }  
+      }
+      
+    if (amountLeft > 12)
+      {
+        if (robotResponsescanDo.size() >= 4)
+        {
+          limit = 4;
+        }
+        if (robotResponsescanDo.size() < 4)
+        {
+          limit = robotResponsescanDo.size();
+        }
+        for(int i = 0; i<limit; i++)
+        {
+         if(robotResponsescanDo[i].robot == int(robotName.at(robotName.size() - 1) - 48))
+          {
+            runCommand = true;
+          } 
+        }  
+      }
+      
     robotResponses.clear();
     robotResponsescanDo.clear();
   }
+  // If the robot got a go on the command they will execute it 
   if(runCommand)
   {
     boost::thread t{executeCommand, robotResponses[0].pickup.source, robotResponses[0].pickup.destination};//, arg1, arg2}; //Add values to pass
