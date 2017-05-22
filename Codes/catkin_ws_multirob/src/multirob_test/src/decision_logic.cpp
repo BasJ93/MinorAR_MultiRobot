@@ -7,6 +7,7 @@
 
 
 #include <ros/ros.h>
+#include <ros/package.h>
 #include <boost/thread.hpp>
 #include <boost/foreach.hpp>
 #define forEach BOOST_FOREACH
@@ -27,6 +28,10 @@
 //Maybe revise msg to fit to all commands, not just pickup
 #include <multirob_test/cmdPickup.h>
 #include <multirob_test/r2rpickupresponse.h>
+
+//The headers to access files.
+#include <iostream>
+#include <fstream>
 
 #include <math.h>
 
@@ -101,7 +106,7 @@ void executeCommand(std::string source, std::string destination)
   RobotHasCommand = true;
   //numberOfRobots = numberOfRobots -1;
   //ROS_INFO("numberOfRobots before executing command %u",numberOfRobots);
-  for(int i=0; i<5; i++)
+  for(int i=0; i<dockNames.size(); i++)
   {
     if(source.compare(dockNames[i]) == 0)
     {
@@ -109,7 +114,7 @@ void executeCommand(std::string source, std::string destination)
       break;
     }
   }
-  for(int i=0; i<5; i++)
+  for(int i=0; i<dockNames.size(); i++)
   {
     if(destination.compare(dockNames[i]) == 0)
     {
@@ -351,11 +356,11 @@ void responseReceived(multirob_test::r2rpickupresponse response)
     //Sort the vector values from low to high       
     std::sort(robotResponsescanDo.begin(), robotResponsescanDo.end(), sortByDistance);
 
-    /*for(int i=0; i<robotResponsescanDo.size(); i++)
+/*    for(int i=0; i<robotResponsescanDo.size(); i++)
     {
       ROS_INFO("Robot %i distance to goal %d", robotResponsescanDo[i].robot, robotResponsescanDo[i].distance);
-    }*/
-    
+    }
+  */  
     //TODO the program has to be written shorter and it has to be able to work with more than 4 robots. So it also has to check with the available robots
     //Check how many robots are needed to transport the amount of products
     int amountLeft = checkAmountLeft(response.pickup.amount);
@@ -424,17 +429,19 @@ void responseReceived(multirob_test::r2rpickupresponse response)
             runCommand = true;
           } 
         }  
-      }      
+      }
+      
+        // If the robot got a go on the command they will execute it 
+      if(runCommand)
+      {
+        boost::thread t{executeCommand, robotResponses[0].pickup.source, robotResponses[0].pickup.destination};
+        ROS_INFO("Execute Command");
+      }  
+//      @TODO: WTF? This can not be done.
     robotResponses.clear();
     robotResponsescanDo.clear();
   }
-  // If the robot got a go on the command they will execute it 
-  if(runCommand)
-  {
-    boost::thread t{executeCommand, robotResponses[0].pickup.source, robotResponses[0].pickup.destination};//, arg1, arg2}; //Add values to pass
-    //executeCommand(robotResponses[0].pickup.source, robotResponses[0].pickup.destination);
-    ROS_INFO("Execute Command");
-  }
+  
 }
 
 //Callback function when a new command msg is received
@@ -499,52 +506,38 @@ int main(int argc, char** argv)
 
   node.getParam("robots_number", numberOfRobots);
   node.getParam("storage_size", storageSize);
+  
+  std::string packagePath = ros::package::getPath("multirob_test");
+  std::string filePath = packagePath + "/locations/locations.txt";
+  ROS_INFO("File path: %s", filePath.c_str());
 
-  dockNames.push_back("A");
-  geometry_msgs::Pose pose;
-  pose.position.x = -5.162;
-  pose.position.y = -5.257;
-  pose.orientation.x = 0.000;
-  pose.orientation.y = 0.000;
-  pose.orientation.z = 0.998;
-  pose.orientation.w = -0.066;
-  dockLocations.push_back(pose);
+  std::ifstream locationfile (filePath.c_str());
+  
+  if (locationfile.is_open()) 
+  {
+    std::string line;
+    geometry_msgs::Pose pose;
+    while ( getline (locationfile,line) )
+    {
+      std::vector<std::string> location;
+      boost::split(location, line, boost::is_any_of("\t"));
 
-  dockNames.push_back("B");
-  pose.position.x = -3.219;
-  pose.position.y = -2.244;
-  pose.orientation.x = 0.000;
-  pose.orientation.y = -0.000;
-  pose.orientation.z = -0.607;
-  pose.orientation.w = 0.794;
-  dockLocations.push_back(pose);
-
-  dockNames.push_back("C");
-  pose.position.x = 8.782;
-  pose.position.y = -5.734;
-  pose.orientation.x = -0.000;
-  pose.orientation.y = -0.000;
-  pose.orientation.z = 0.803;
-  pose.orientation.w = 0.595;
-  dockLocations.push_back(pose);
-
-  dockNames.push_back("D");
-  pose.position.x = 6.000;
-  pose.position.y = 6.000;
-  pose.orientation.x = -0.000;
-  pose.orientation.y = -0.000;
-  pose.orientation.z = 0.803;
-  pose.orientation.w = 0.595;
-  dockLocations.push_back(pose);
-
-  dockNames.push_back("E");
-  pose.position.x = -6.000;
-  pose.position.y = 6.000;
-  pose.orientation.x = -0.000;
-  pose.orientation.y = -0.000;
-  pose.orientation.z = 0.803;
-  pose.orientation.w = 0.595;
-  dockLocations.push_back(pose);
+      dockNames.push_back(location[0]);
+      pose.position.x = std::stod(location[1]);
+      pose.position.y = std::stod(location[2]);
+      pose.orientation.x = std::stod(location[3]);
+      pose.orientation.y = std::stod(location[4]);
+      pose.orientation.z = std::stod(location[5]);
+      pose.orientation.w = std::stod(location[6]);
+      dockLocations.push_back(pose);
+    }
+    locationfile.close();
+  }
+  
+  for(int i=0; i<dockNames.size(); i++)
+  {
+    ROS_INFO("Dock loaded: %s", dockNames[i].c_str());
+  }
 
   ros::spin();
 
