@@ -67,6 +67,8 @@ std::string robotName;
 int numberOfRobots;
 int storageSize;
 bool sim;
+int productsToCarry;
+int productsLoaded;
 
 bool sortByDistance(multirob_test::r2rpickupresponse response1, multirob_test::r2rpickupresponse response2)
 {
@@ -102,7 +104,7 @@ void moveToLocation(geometry_msgs::Pose pose)
 
 void executeCommand(std::string source, std::string destination)
 {
-  ROS_INFO(" %s will execute the command.", robotName.c_str());
+  ROS_INFO("%s will execute the command.", robotName.c_str());
   RobotHasCommand = true;
   //numberOfRobots = numberOfRobots -1;
   //ROS_INFO("numberOfRobots before executing command %u",numberOfRobots);
@@ -114,6 +116,10 @@ void executeCommand(std::string source, std::string destination)
       break;
     }
   }
+  
+  productsLoaded = productsToCarry;
+  ROS_INFO("%s productsLoaded %i", robotName.c_str(), productsLoaded);
+  
   for(int i=0; i<dockNames.size(); i++)
   {
     if(destination.compare(dockNames[i]) == 0)
@@ -122,6 +128,9 @@ void executeCommand(std::string source, std::string destination)
       break;
     }
   }
+  
+  productsLoaded = 0;
+  ROS_INFO("%s productsLoaded %i", robotName.c_str(), productsLoaded);
   RobotHasCommand = false;
   //numberOfRobots = numberOfRobots + 1;
   //ROS_INFO("numberOfRobots after executing command %u",numberOfRobots);
@@ -211,46 +220,39 @@ float calcGoalDistance(geometry_msgs::Pose pose)
   }
 }
 
-//TODO it doesn't allow the void to use the parameters amount and storageSize. 
-int checkInventory(int amount)
+//Function will check the inventory of the robot and will give as result the storageused and the amount left 
+std::vector<int> checkInventory(int amount)
 {
   //Normaly we would check the I/O's representing the loaded products, but we currently have a simulation.
+  std::vector<int> result = {0,0}; //StorageSizeUsed, Amount
   int storageSizeUsed = 0;
   if(sim)
   {
     if(storageSize < amount)
     {
       storageSizeUsed = storageSize;
-      //amount = amount - storageSize;
+      amount = amount - storageSizeUsed;
       //ROS_INFO("storageSizeUsed %u", storageSizeUsed);
-      //ROS_INFO("Amountleft %u", amount);
-      return storageSizeUsed;
+      //ROS_INFO("Amountleft1 %u", amount);
+      result[0] = storageSizeUsed;
+      result[1] = amount;
+      return result;
     }
-    if(storageSize = amount)
+    if(storageSize >= amount)
     {
-      storageSizeUsed = storageSize;
+      storageSizeUsed = amount;
+      amount = 0;
       //ROS_INFO("storageSizeUsed %u", storageSizeUsed);
-      return storageSizeUsed;
+      //ROS_INFO("Amountleft2 %u", amount);
+      result[0] = storageSizeUsed;
+      result[1] = amount;
+      return result;
     }
-    else
-    {
-      storageSizeUsed = storageSize - amount;
-      //ROS_INFO("storageSizeUsed %u", storageSizeUsed);
-      return storageSizeUsed;
-    }
-    //return storageSize;
   }
   else
   {
-    return 0;
+    return result;
   }
-}
-
-int checkAmountLeft(int amount)
-{
-int amountLeft = 0;
-amountLeft = amount - storageSize;
-return amountLeft;
 }
 
 int sendToOtherRobots(multirob_test::r2rpickupresponse response)
@@ -312,18 +314,18 @@ void startNewCommand(robotPickupCommand command)
     }
   }
 
-  int space = checkInventory(command.amount);
+  std::vector<int> space = checkInventory(command.amount);
 
   multirob_test::r2rpickupresponse response;
   response.robot = int(robotName.at(robotName.size() - 1)) - 48;
   response.pickup.source = command.source;
   response.pickup.destination = command.destination;
   response.pickup.amount = command.amount;
-  if(distance != -1 && space > 0)
+  if(distance != -1 && space[0] > 0)
   {
     response.canDo = true;
     response.distance = int(distance * 1000);
-    response.space = space;
+    response.space = space[0];
   }
   else
   {
@@ -361,83 +363,69 @@ void responseReceived(multirob_test::r2rpickupresponse response)
       ROS_INFO("Robot %i distance to goal %d", robotResponsescanDo[i].robot, robotResponsescanDo[i].distance);
     }
   */  
-    //TODO the program has to be written shorter and it has to be able to work with more than 4 robots. So it also has to check with the available robots
     //Check how many robots are needed to transport the amount of products
-    int amountLeft = checkAmountLeft(response.pickup.amount);
-    ROS_INFO("amountLeft %u", amountLeft);
-    int limit = 0;
+    
+    std::vector<int> Result = checkInventory(response.pickup.amount);
+    //ROS_INFO("amountLeft %u", amountLeft);
+    int limit = robotResponsescanDo.size();
+    int amountLeft = Result[1];
+    //ROS_INFO("amountleft %i", amountLeft);
     if (amountLeft <= 0)
+    {
+      if(robotResponsescanDo[0].robot == int(robotName.at(robotName.size() - 1) - 48))
       {
-        if(robotResponsescanDo[0].robot == int(robotName.at(robotName.size() - 1) - 48))
+        productsToCarry = Result[0];
+        ROS_INFO("%s productsToCarry %i",robotName.c_str(), productsToCarry);
+        runCommand = true;
+      }
+    }    
+    for(int i = 0; limit > 0 && amountLeft > 0 && response.canDo == true; i++)
+    {
+      if(robotResponsescanDo[i].robot == int(robotName.at(robotName.size() - 1) - 48))
+      {
+        if (i == 0)
+        { 
+          productsToCarry = storageSize;
+          ROS_INFO("%s productsToCarry %i",robotName.c_str(), productsToCarry);          
+        }
+        if (i > 0)
         {
-          runCommand = true;
+          std::vector<int> Result2 = checkInventory(amountLeft);
+          amountLeft = Result2[1];
+          productsToCarry = Result2[0];
+          ROS_INFO("%s productsToCarry %i",robotName.c_str(), productsToCarry);
+          //ROS_INFO("amountleft  %i",i, amountLeft);
+        }
+        runCommand = true;
+        response.canDo = false;
+      }
+      else
+      {
+        if (i == 0)
+        { 
+          amountLeft = amountLeft;        
+        }
+        if (i > 0)
+        {
+          std::vector<int> Result2 = checkInventory(amountLeft);
+          amountLeft = Result2[1];
+          productsToCarry = Result2[0];
+          //ROS_INFO("productsToCarry %i", productsToCarry);
+          //ROS_INFO("amountleft  %i",i, amountLeft);
         }
       }
-          
-    if (amountLeft > 0 && amountLeft <= 6)
-      {
-        if (robotResponsescanDo.size() >= 2)
-        {
-          limit = 2;
-        }
-        if (robotResponsescanDo.size() < 2)
-        {
-          limit = robotResponsescanDo.size();
-        }
-        for(int i =0; i<limit; i++)
-        {
-          if(robotResponsescanDo[i].robot == int(robotName.at(robotName.size() - 1) - 48))
-          {
-            runCommand = true;
-          }
-        }  
-      }
-     
-    if (amountLeft > 6 && amountLeft <=12)
-      {
-        if (robotResponsescanDo.size() >= 3)
-        {
-          limit = 3;
-        }
-        if (robotResponsescanDo.size() < 3)
-        {
-          limit = robotResponsescanDo.size();
-        }
-        for(int i = 0; i<limit; i++)
-        {
-         if(robotResponsescanDo[i].robot == int(robotName.at(robotName.size() - 1) - 48))
-          {
-            runCommand = true;
-          }
-        }  
-      }
-      
-    if (amountLeft > 12)
-      {
-        if (robotResponsescanDo.size() >= 4)
-        {
-          limit = 4;
-        }
-        if (robotResponsescanDo.size() < 4)
-        {
-          limit = robotResponsescanDo.size();
-        }
-        for(int i = 0; i<limit; i++)
-        {
-         if(robotResponsescanDo[i].robot == int(robotName.at(robotName.size() - 1) - 48))
-          {
-            runCommand = true;
-          } 
-        }  
-      }
-      
-        // If the robot got a go on the command they will execute it 
-      if(runCommand)
-      {
-        boost::thread t{executeCommand, robotResponses[0].pickup.source, robotResponses[0].pickup.destination};
-        ROS_INFO("Execute Command");
-      }  
-//      @TODO: WTF? This can not be done.
+      limit = limit - 1;
+    }
+    if (limit <= 0 && amountLeft > 0)
+    {
+      ROS_INFO("!!!!!!!!!!!!!!!!!!!!!!!!!!Products left: %i!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", amountLeft);
+    }
+    // If the robot got a go on the command they will execute it 
+    if(runCommand)
+    {
+      boost::thread t{executeCommand, robotResponses[0].pickup.source, robotResponses[0].pickup.destination};
+      ROS_INFO("Execute Command");
+    }  
     robotResponses.clear();
     robotResponsescanDo.clear();
   }
