@@ -43,9 +43,9 @@ class guiElements:
         with open(pathLocations) as f:
             for line in f:
                 #print line
-                line.split('\t')
-                self.comboBoxSource.append_text(line[0])
-                self.comboBoxDestination.append_text(line[0])
+                words = line.split('\t')
+                self.comboBoxSource.append_text(words[0])
+                self.comboBoxDestination.append_text(words[0])
                 if 'str' in line:
                     break
                 
