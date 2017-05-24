@@ -9,6 +9,7 @@ project(multirob_test)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  roslib
   std_msgs
   message_generation
   move_base_msgs
