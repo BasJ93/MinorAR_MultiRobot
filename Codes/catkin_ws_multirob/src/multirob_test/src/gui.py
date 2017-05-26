@@ -13,6 +13,7 @@ pygtk.require('2.0')
 import gtk
 
 pathLocations = "blah"
+sim = False
 
 class guiElements:
     def sendCommand(self, widget):
@@ -94,11 +95,25 @@ class guiElements:
 
 #print __name__
 if __name__ == "__main__":
+    if(len(sys.argv) > 1):
+        if(sys.argv[1] == "sim"):
+            sim = True
+            
     rospy.init_node('multirob_test_gui', anonymous=True)
     rospack = rospkg.RosPack()
+    
+    if rospy.has_param('sim'):
+        if(sim or rospy.get_param('sim')):
+            sim=True
+        rospy.loginfo("Sim parameter exists")
+    else:
+        rospy.loginfo("Sim parameter does not exist")
 
     packagePath = rospack.get_path("multirob_test")
-    pathLocations = packagePath + "/locations/locations.txt"
+    if(sim):
+        pathLocations = packagePath + "/locations/locations_sim.txt"
+    else:
+        pathLocations = packagePath + "/locations/locations.txt"
         
     gui = guiElements()
     #gui.main()

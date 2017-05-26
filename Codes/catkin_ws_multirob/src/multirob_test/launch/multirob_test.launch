@@ -33,4 +33,9 @@
   <include file="$(find multirob_test)/includes/rviz.launch.xml" >
     <arg name="sim" value="$(arg sim)" />
   </include>
+  
+  <param name="sim" value="$(arg sim)" />
+  <node name="multirob_test_gui" type="gui.py" pkg="multirob_test" output="screen">
+    <param name="sim" value="$(arg sim)" />
+  </node>
 </launch>

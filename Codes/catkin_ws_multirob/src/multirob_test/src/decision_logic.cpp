@@ -496,7 +496,15 @@ int main(int argc, char** argv)
   node.getParam("storage_size", storageSize);
   
   std::string packagePath = ros::package::getPath("multirob_test");
-  std::string filePath = packagePath + "/locations/locations.txt";
+  std::string filePath;
+  if(sim)
+  {
+    filePath = packagePath + "/locations/locations_sim.txt";
+  }
+  else
+  {
+    filePath = packagePath + "/locations/locations.txt";
+  }
   ROS_INFO("File path: %s", filePath.c_str());
 
   std::ifstream locationfile (filePath.c_str());
