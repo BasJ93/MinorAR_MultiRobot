@@ -1,22 +1,26 @@
 <launch>
+  <arg name="sim" default="true" />
   <arg name="mapping" default="false" />
   <arg name="3d_sensor" value="$(optenv TURTLEBOT_3D_SENSOR astra)"/>
   <!-- gazebo world start -->
-  <include file="$(find gazebo_ros)/launch/empty_world.launch">
-    <arg name="use_sim_time" value="true"/>
-    <arg name="debug" value="false"/>
-    <arg name="world_name" value="$(find multirob_test)/worlds/gazebo.world"/>
-    <arg name="gui" value="true"/>
-  </include>
-  <!-- Map server -->
-  <arg name="map_file" default="$(find multirob_test)/maps/gazebo_2.yaml"/>
-  <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" unless="$(arg mapping)">
-       <param name="frame_id" value="/map"/>
-  </node>
+  <group if="$(arg sim)">
+    <include file="$(find gazebo_ros)/launch/empty_world.launch">
+      <arg name="use_sim_time" value="true"/>
+      <arg name="debug" value="false"/>
+      <arg name="world_name" value="$(find multirob_test)/worlds/gazebo.world"/>
+      <arg name="gui" value="true"/>
+    </include>
+    <!-- Map server -->
+    <arg name="map_file" default="$(find multirob_test)/maps/gazebo_2.yaml"/>
+    <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)" unless="$(arg mapping)">
+         <param name="frame_id" value="/map"/>
+    </node>
+  </group>
   <!-- include robots -->
 
   <include file="$(find multirob_test)/includes/agents.launch.xml">
     <arg name="mapping" value="$(arg mapping)" />
+    <arg name="sim" value="$(arg sim)" />
   </include>
 
   <group if="$(arg mapping)">
@@ -26,5 +30,12 @@
     </include>
   </group>
 
-  <include file="$(find multirob_test)/includes/rviz.launch.xml" />
+  <include file="$(find multirob_test)/includes/rviz.launch.xml" >
+    <arg name="sim" value="$(arg sim)" />
+  </include>
+  
+  <param name="sim" value="$(arg sim)" />
+  <node name="multirob_test_gui" type="gui.py" pkg="multirob_test" output="screen">
+    <param name="sim" value="$(arg sim)" />
+  </node>
 </launch>

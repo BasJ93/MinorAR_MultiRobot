@@ -1,6 +1,6 @@
 # generated from genmsg/cmake/pkg-genmsg.cmake.em
 
-message(STATUS "multirob_test: 1 messages, 0 services")
+message(STATUS "multirob_test: 2 messages, 0 services")
 
 set(MSG_I_FLAGS "-Imultirob_test:/home/bas/catkin_ws_multirob/src/multirob_test/msg;-Istd_msgs:/opt/ros/indigo/share/std_msgs/cmake/../msg")
 
@@ -20,6 +20,11 @@ add_custom_target(_multirob_test_generate_messages_check_deps_${_filename}
   COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "multirob_test" "/home/bas/catkin_ws_multirob/src/multirob_test/msg/cmdPickup.msg" ""
 )
 
+get_filename_component(_filename "/home/bas/catkin_ws_multirob/src/multirob_test/msg/r2rpickupresponse.msg" NAME_WE)
+add_custom_target(_multirob_test_generate_messages_check_deps_${_filename}
+  COMMAND ${CATKIN_ENV} ${PYTHON_EXECUTABLE} ${GENMSG_CHECK_DEPS_SCRIPT} "multirob_test" "/home/bas/catkin_ws_multirob/src/multirob_test/msg/r2rpickupresponse.msg" "multirob_test/cmdPickup"
+)
+
 #
 #  langs = gencpp;genlisp;genpy
 #
@@ -30,6 +35,12 @@ _generate_msg_cpp(multirob_test
   "/home/bas/catkin_ws_multirob/src/multirob_test/msg/cmdPickup.msg"
   "${MSG_I_FLAGS}"
   ""
+  ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/multirob_test
+)
+_generate_msg_cpp(multirob_test
+  "/home/bas/catkin_ws_multirob/src/multirob_test/msg/r2rpickupresponse.msg"
+  "${MSG_I_FLAGS}"
+  "/home/bas/catkin_ws_multirob/src/multirob_test/msg/cmdPickup.msg"
   ${CATKIN_DEVEL_PREFIX}/${gencpp_INSTALL_DIR}/multirob_test
 )
 
@@ -49,6 +60,8 @@ add_dependencies(multirob_test_generate_messages multirob_test_generate_messages
 # add dependencies to all check dependencies targets
 get_filename_component(_filename "/home/bas/catkin_ws_multirob/src/multirob_test/msg/cmdPickup.msg" NAME_WE)
 add_dependencies(multirob_test_generate_messages_cpp _multirob_test_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/bas/catkin_ws_multirob/src/multirob_test/msg/r2rpickupresponse.msg" NAME_WE)
+add_dependencies(multirob_test_generate_messages_cpp _multirob_test_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
 add_custom_target(multirob_test_gencpp)
@@ -63,6 +76,12 @@ _generate_msg_lisp(multirob_test
   "/home/bas/catkin_ws_multirob/src/multirob_test/msg/cmdPickup.msg"
   "${MSG_I_FLAGS}"
   ""
+  ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/multirob_test
+)
+_generate_msg_lisp(multirob_test
+  "/home/bas/catkin_ws_multirob/src/multirob_test/msg/r2rpickupresponse.msg"
+  "${MSG_I_FLAGS}"
+  "/home/bas/catkin_ws_multirob/src/multirob_test/msg/cmdPickup.msg"
   ${CATKIN_DEVEL_PREFIX}/${genlisp_INSTALL_DIR}/multirob_test
 )
 
@@ -82,6 +101,8 @@ add_dependencies(multirob_test_generate_messages multirob_test_generate_messages
 # add dependencies to all check dependencies targets
 get_filename_component(_filename "/home/bas/catkin_ws_multirob/src/multirob_test/msg/cmdPickup.msg" NAME_WE)
 add_dependencies(multirob_test_generate_messages_lisp _multirob_test_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/bas/catkin_ws_multirob/src/multirob_test/msg/r2rpickupresponse.msg" NAME_WE)
+add_dependencies(multirob_test_generate_messages_lisp _multirob_test_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility
 add_custom_target(multirob_test_genlisp)
@@ -96,6 +117,12 @@ _generate_msg_py(multirob_test
   "/home/bas/catkin_ws_multirob/src/multirob_test/msg/cmdPickup.msg"
   "${MSG_I_FLAGS}"
   ""
+  ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/multirob_test
+)
+_generate_msg_py(multirob_test
+  "/home/bas/catkin_ws_multirob/src/multirob_test/msg/r2rpickupresponse.msg"
+  "${MSG_I_FLAGS}"
+  "/home/bas/catkin_ws_multirob/src/multirob_test/msg/cmdPickup.msg"
   ${CATKIN_DEVEL_PREFIX}/${genpy_INSTALL_DIR}/multirob_test
 )
 
@@ -114,6 +141,8 @@ add_dependencies(multirob_test_generate_messages multirob_test_generate_messages
 
 # add dependencies to all check dependencies targets
 get_filename_component(_filename "/home/bas/catkin_ws_multirob/src/multirob_test/msg/cmdPickup.msg" NAME_WE)
+add_dependencies(multirob_test_generate_messages_py _multirob_test_generate_messages_check_deps_${_filename})
+get_filename_component(_filename "/home/bas/catkin_ws_multirob/src/multirob_test/msg/r2rpickupresponse.msg" NAME_WE)
 add_dependencies(multirob_test_generate_messages_py _multirob_test_generate_messages_check_deps_${_filename})
 
 # target for backward compatibility

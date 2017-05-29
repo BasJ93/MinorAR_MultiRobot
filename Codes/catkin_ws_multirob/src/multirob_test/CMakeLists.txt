@@ -9,8 +9,14 @@ project(multirob_test)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  roslib
   std_msgs
   message_generation
+  move_base_msgs
+  nav_msgs
+  actionlib
+  geometry_msgs
+  tf
   )
 
 ## System dependencies are found with CMake's conventions
@@ -50,6 +56,7 @@ find_package(catkin REQUIRED COMPONENTS
  add_message_files(
    FILES
    cmdPickup.msg
+   r2rpickupresponse.msg
  )
 
 ## Generate services in the 'srv' folder
@@ -114,7 +121,7 @@ catkin_package(
 
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
-# include_directories(include)
+include_directories(include ${catkin_INCLUDE_DIRS})
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
