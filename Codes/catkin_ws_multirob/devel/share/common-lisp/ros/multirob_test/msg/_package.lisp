@@ -3,5 +3,7 @@
   (:export
    "<CMDPICKUP>"
    "CMDPICKUP"
+   "<R2RPICKUPRESPONSE>"
+   "R2RPICKUPRESPONSE"
   ))
 
