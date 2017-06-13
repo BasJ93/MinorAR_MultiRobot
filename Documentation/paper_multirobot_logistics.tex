@@ -1,0 +1,63 @@
+\documentclass[10pt, journal]{IEEEtran}
+\usepackage{lipsum}
+\usepackage{cite}
+\usepackage{url}
+
+
+\author{\IEEEauthorblockN{Remco Aarts}, 
+ \IEEEauthorblockN{Jeroen van den Akker}, 
+ \IEEEauthorblockN{Robert Delmaar}, 
+ \IEEEauthorblockN{Bas Janssen},
+ \IEEEauthorblockN{Addie Perenboom},
+ \IEEEauthorblockN{Dimitri Waard}}
+
+%\author{Remco Aarts, Jeroen van den Akker, Robert Delmaar, Bas Janssen, Addie Perenboom, Dimitri Waard}
+
+\title{Decentralized multi-robot logistics}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+This paper details the design and implementation of a decentralized multi-robot logistics system. Both the hardware design and the software design and implementation are expended upon below.
+\end{abstract}
+\begin{IEEEkeywords}
+
+\end{IEEEkeywords}
+
+\section{Introduction}
+The decentralized multi-robot logistics project is one of the main projects of the Adaptive Robotics Minor at Fontys Hogeschool Engineering, in the 2016-2017 academic year. The goal of this project is to develop a system, both hardware and software, that is capable of transporting product between a warehouse and production locations in an Industry 4.0 setting. The system can be a replacement for a traditional conveyor belt, or can be used as a flexible addition to an existing conveyor system.
+
+\section{Hardware}
+
+\subsection{Gripper}
+\lipsum[4]
+
+\subsection{Product carrier}
+\lipsum[5]
+
+\subsection{Stackup}
+\lipsum[7-8]
+
+\section{Software}
+During this project a team of two students has developed the software making the decisions on the robots. This software is designed to receive commands from one or more workstations, and have to robots decide which robot should execute a command. The robots have the ability to request help from one another when more product have to be transported than a single robot can carry, or it is beneficial to transfer one or more products between two robots to get the products to their destination faster.
+
+\subsection{Distance calulation}
+The robots make decisions based on their available inventory space, and the distance between the robot and the goal. The distance of the planned path is calculated using equation \ref{eq_pathlength}. This means that for each point in the path, the distance to the next point is calculated. The length is the sum of these distances.
+\begin{equation}
+\label{eq_pathlength}
+x = \sum\limits_{i=0}^j \sqrt{(y_i - y_{i+1})^2 + (x_i - x_{i+1})^2}
+\end{equation}
+
+\subsection{Multimaster-fkie}
+All the robots in the group communicate with each other. As each robot is its own ROS master, the normal\cite{ROSMultipleMachines} way of using multiple machines in the ROS ecosystem is not viable. However, a package capable of communicating between multiple independent ROS masters has been developed at the Fraunhofer-Institut für Kommunikation, Informationsverarbeitung und Ergonomie FKIE, called multimaster-fkie \cite{Multimaster-fkie}. Using this package it is possible to synchronize one or more topics between one or more ROS masters. This project uses said functionality to synchronize the command and control topics for the robots between the robots and the workstations.
+\subsection{Software scales to more robots}
+\lipsum[13-14]
+\subsection{Software performs better when using a big map}
+\lipsum[15-16]
+\subsection{Replace turtlebots}
+\lipsum[10-11]
+
+\bibliographystyle{IEEEtran}
+\bibliography{paper_multirobot_logistics}
+\end{document}
