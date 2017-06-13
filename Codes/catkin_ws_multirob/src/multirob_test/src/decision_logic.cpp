@@ -26,6 +26,7 @@
 //Maybe revise msg to fit to all commands, not just pickup
 #include <multirob_test/cmdPickup.h>
 #include <multirob_test/r2rpickupresponse.h>
+#include <multirob_test/pickupProducts.h>
 
 //The headers to access files.
 #include <iostream>
@@ -38,12 +39,21 @@
 tf::TransformListener* listener = NULL;
 
 //Define a struct to keep the pickup commands for the robot
+struct pickupProductsResponse
+{
+  std::string robot;
+  int robotX;
+  int robotY;
+};
+
 struct robotPickupCommand {
+  std::string robotName;
   std::string source;
   std::string destination;
   std::string product;
   int amountTotal;
   std::vector<int> amount;
+  bool sendLocation;
   bool done;
 };
 
@@ -58,9 +68,14 @@ std::vector<std::string> dockNames;
 //Design a struct to store the data for a location, then build a vector with this struct.
 std::vector<geometry_msgs::Pose> dockLocations;
 
+std::vector<int> amountLeft = {0,0,0,0,0};
+std::string amountLeftSource;
+
 typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseClient;
 
 ros::Publisher robotComms; //This would not be thread safe
+ros::Publisher robotMsg;
+ros::Publisher pickupProducts;
 
 std::string robotName;
 int numberOfRobots;
@@ -101,9 +116,29 @@ void moveToLocation(geometry_msgs::Pose pose)
   }
 }
 
-void executeCommand(std::string source, std::string destination, std::vector<int> amount)
+/*void leftOvers()
+{
+  int amountLeftTotal=0;
+  for(int i = 0; i < amountLeft.size(); i++)
+  {
+    amountLeftTotal = amountLeftTotal + amountLeft[i];
+  }  
+  ROS_INFO("SEND NEW MESSAGE WITH %i Products",amountLeftTotal);
+  multirob_test::cmdPickup msg;
+  msg.source = amountLeftSource ;
+  msg.destination= "";
+  msg.product= "";
+  msg.amountTotal= 0;
+  msg.amount= amountLeft;
+  msg.sendLocation = false; 
+  robotMsg.publish(msg);
+}*/
+
+void executeCommand(std::string source, std::vector<int> amount)
 {
   ROS_INFO("%s will execute the command.", robotName.c_str());
+  int amountLeftTotal = 0;
+
   RobotHasCommand = true;
   for(int i=0; i<dockNames.size(); i++)
   {
@@ -116,6 +151,34 @@ void executeCommand(std::string source, std::string destination, std::vector<int
   productsLoaded = productsToCarry;
   productsToCarry =  0;
   ROS_INFO("%s productsLoaded %i", robotName.c_str(), productsLoaded);
+  int amountLocations = 0;
+  for(int i=0; i<amount.size();i++)
+  {
+    if(amount[i] > 0)
+    {
+      amountLocations = amountLocations + 1;
+    }
+    else
+    {
+      amountLocations = amountLocations;
+    }
+  }
+  ROS_INFO("%s amountLocations %i", robotName.c_str(), amountLocations);  
+  
+  if(amountLocations ==2)
+  {
+    ROS_INFO("%s I need help, can anyone transfer",robotName.c_str());
+    multirob_test::cmdPickup msg;
+    msg.robotName = robotName;
+    msg.source = amountLeftSource;
+    msg.destination= "";
+    msg.product= "";
+    msg.amountTotal= 0;
+    msg.amount= amount;
+    msg.sendLocation = true; 
+    robotMsg.publish(msg);
+  }
+  
   
   for(int i = 0; i < amount.size(); i++)
   {
@@ -123,7 +186,7 @@ void executeCommand(std::string source, std::string destination, std::vector<int
     {
       ROS_INFO("No products of this locations");
     }
-    if(amount[i] >0)
+    if(amount[i] > 0)
     {
       moveToLocation(dockLocations[i]); 
       productsLoaded = productsLoaded - amount[i];
@@ -135,6 +198,30 @@ void executeCommand(std::string source, std::string destination, std::vector<int
     } 
   }
   RobotHasCommand = false;
+  
+  for(int i = 0; i < amountLeft.size(); i++)
+  {
+    amountLeftTotal = amountLeftTotal + amountLeft[i];
+  }  
+  
+  if(amountLeftTotal > 0)
+  {
+    ROS_INFO("SEND NEW MESSAGE WITH %i Products",amountLeftTotal);
+    multirob_test::cmdPickup msg;
+    msg.robotName = robotName.c_str();
+    msg.source = amountLeftSource ;
+    msg.destination= "";
+    msg.product= "";
+    msg.amountTotal= 0;
+    msg.amount= amountLeft;
+    msg.sendLocation = false; 
+    robotMsg.publish(msg);
+  }
+  
+  else
+  {
+    ROS_INFO("%s Robot is able to receive new command", robotName.c_str());
+  }
 }
 
 //Function to calculate the disatance from the robot to a given target location, in the x,y and quaternion notation. Returns a float representing the lenght of the path.\
@@ -183,7 +270,7 @@ float calcGoalDistance(geometry_msgs::Pose pose)
       //Loop through all poses in the path, and calculate the distances between each set of poses. Add these distances to get the full path lenght.
       if(plan.response.plan.poses.size())
       {
-        ROS_INFO("Path has %lu points.", plan.response.plan.poses.size());
+        //ROS_INFO("Path has %lu points.", plan.response.plan.poses.size());
         float pathLenght = 0;
         for (int i=0; i<plan.response.plan.poses.size(); i++)
         {
@@ -200,7 +287,6 @@ float calcGoalDistance(geometry_msgs::Pose pose)
           ROS_INFO("Invalid path lenght.");
           return -1;
         }
-	//return pathLenght;
       }
       else
       {
@@ -225,6 +311,7 @@ float calcGoalDistance(geometry_msgs::Pose pose)
 std::vector<int> checkInventory(std::vector<int> amount)
 {
   //Normaly we would check the I/O's representing the loaded products, but we currently have a simulation.
+  //TODO goto has to be replaced 
   std::vector<int> result = {0,0,0,0,0,0,0,0,0,0}; //storageSizeUsed, amountLeft
   int storageSizeLeft = 6;
   int save = 0;
@@ -247,7 +334,6 @@ std::vector<int> checkInventory(std::vector<int> amount)
           if(i == 0)
           {
             save = amount[0];
-            //ROS_INFO("%s save %i",robotName.c_str(), save);
             save2 = 0;
           }  
           if(save < amount[i])
@@ -265,7 +351,6 @@ std::vector<int> checkInventory(std::vector<int> amount)
         {
           for(int i = 0; i<5; i++)
           {
-            //ROS_INFO("%s save2 %i %i",robotName.c_str(), save, storageSize);
             if(i == save2)
             {
               result[i] = save;
@@ -273,7 +358,7 @@ std::vector<int> checkInventory(std::vector<int> amount)
               for(int i = 0; i < 5; i++)
               {
                 storageSizeLeft = storageSizeLeft - result[i];
-              }                
+              } 
             }
             else
             {
@@ -282,12 +367,18 @@ std::vector<int> checkInventory(std::vector<int> amount)
           }
           for(int i = 0; i < 5; i++)
           {
-            if(amount[i] < storageSizeLeft)
+            if(amount[i] <= storageSizeLeft && amount[i] >0)
             { 
               result[i] = result[i] + amount[i];
               amount[i] = 0;
               storageSizeLeft = storageSizeLeft - result[i];
             }
+            else if(amount[i] > storageSizeLeft)
+            {
+              result[i] = result[i];
+              amount[i] = amount[i];
+            }
+            
           }
           getOut = true;
           goto LOOP;
@@ -309,9 +400,8 @@ std::vector<int> checkInventory(std::vector<int> amount)
           getOut = true;
           goto LOOP;
         }
-        if(save*100 > storageSize*100);
+        if(save> storageSize);
         {
-          //ROS_INFO("%s boe %i %i",robotName.c_str(), save, storageSize);
           for(int i = 0; i<5; i++)
           {
             if( i == save2)
@@ -356,9 +446,9 @@ void checkWithExisting(robotPickupCommand command)
 {
   ROS_INFO("%s had a command running already.",robotName.c_str());
   
-  float distance;
+  float distance = 0;
   
-  for(int i=0; i<5; i++)
+  /*for(int i=0; i<5; i++)
   {
     if(command.source.compare(dockNames[i]) == 0)
     {
@@ -370,19 +460,22 @@ void checkWithExisting(robotPickupCommand command)
     {
       distance = -1;
     }
-  } 
+  }*/ 
+  distance = -1;
   int amountTotal1 = 0;
   for(int i = 0; i < command.amount.size(); i++)
   {
     amountTotal1 = amountTotal1 + command.amount[i];
-    //ROS_INFO("amountTotal1 %i",amountTotal1);
   }  
   multirob_test::r2rpickupresponse response;
   response.robot = int(robotName.at(robotName.size() - 1)) - 48;
+  response.pickup.robotName = command.robotName;
   response.pickup.source = command.source;
   response.pickup.destination = command.destination;
   response.pickup.amountTotal = amountTotal1;
   response.pickup.amount = command.amount;
+  response.pickup.sendLocation = command.sendLocation;
+  ROS_INFO("SL4: %s", command.sendLocation ? "true" : "false");
 
   response.canDo = false;
 
@@ -394,52 +487,103 @@ void checkWithExisting(robotPickupCommand command)
 
 void startNewCommand(robotPickupCommand newCommand)
 {
-  ROS_INFO("Executing new command.");
-  
-  float distance;
-//Tell all other robots that the command can be executed by the this robot
-  for(int i=0; i<5; i++)
+  float distance =0;
+  int storageSizeUsed = 0;
+  if(newCommand.sendLocation == true)
   {
-    if(newCommand.source.compare(dockNames[i]) == 0)
+    ROS_INFO("%s Calculate the distance to locations",robotName.c_str());
+    
+    for(int i=0; i< newCommand.amount.size(); i++)
     {
-      distance = calcGoalDistance(dockLocations[i]);
-      ROS_INFO("Robot %i :Distance to goal %s: %f", (robotName.at(robotName.size() - 1)) - 48, dockNames[i].c_str(), distance);
-      break;
+      if(newCommand.amount[i] > 0)
+      {
+        distance = distance + calcGoalDistance(dockLocations[i]);
+      }
+      else
+      {
+        distance = distance;
+      }
+    }
+    ROS_INFO("%s :Distance to goals : %f",robotName.c_str(), distance);
+    
+    multirob_test::r2rpickupresponse response;
+    response.robot = int(robotName.at(robotName.size() - 1)) - 48;
+    response.pickup.robotName = newCommand.robotName;
+    response.pickup.source = newCommand.source;
+    response.pickup.destination = newCommand.destination;
+    response.pickup.amountTotal = newCommand.amountTotal;
+    response.pickup.amount = newCommand.amount;
+    response.pickup.sendLocation = newCommand.sendLocation;
+    ROS_INFO("SL2: %s", newCommand.sendLocation ? "true" : "false");
+       
+    if(distance != -1)
+    {
+      //ROS_INFO("check");
+      response.canDo = true;
+      response.distance = int(distance * 1000);
+      response.space = storageSizeUsed;
     }
     else
     {
-      distance = -1;
+      //ROS_INFO("check 2");
+      response.canDo = false;
+      response.distance = distance;
+      response.space = 0;
     }
+    sendToOtherRobots(response);
   }
-  std::vector<int> space = checkInventory(newCommand.amount);
-  int storageSizeUsed = 0;
-  for( int i= 0; i < 5; i++)
-  {
-    storageSizeUsed = storageSizeUsed + space[i];
-  }
-  //ROS_INFO("startNewCommand storageSizeUsed %i", storageSizeUsed);
   
-  multirob_test::r2rpickupresponse response;
-  response.robot = int(robotName.at(robotName.size() - 1)) - 48;
-  response.pickup.source = newCommand.source;
-  response.pickup.destination = newCommand.destination;
-  response.pickup.amountTotal = newCommand.amountTotal;
-  response.pickup.amount = newCommand.amount;
-  
-  if(distance != -1 && storageSizeUsed > 0)
-  {
-    response.canDo = true;
-    response.distance = int(distance * 1000);
-    response.space = storageSizeUsed;
-  }
   else
   {
-    response.canDo = false;
-    response.distance = distance;
-    response.space = 0;
-  }
-
-  sendToOtherRobots(response);
+    ROS_INFO("Executing new command.");
+    //Tell all other robots that the command can be executed by the this robot
+    for(int i=0; i<5; i++)
+    {
+     if(newCommand.source.compare(dockNames[i]) == 0)
+      {
+        distance = calcGoalDistance(dockLocations[i]);
+        ROS_INFO("Robot %i :Distance to goal %s: %f", (robotName.at(robotName.size() - 1)) - 48, dockNames[i].c_str(), distance);
+        break;
+      }
+      else
+      {
+        distance = -1;
+      }
+    }
+    std::vector<int> space = checkInventory(newCommand.amount);
+ 
+    for( int i= 0; i < 5; i++)
+    {
+      storageSizeUsed = storageSizeUsed + space[i];
+    }
+    //ROS_INFO("startNewCommand storageSizeUsed %i", storageSizeUsed);
+   
+    multirob_test::r2rpickupresponse response;
+    response.robot = int(robotName.at(robotName.size() - 1)) - 48;
+    response.pickup.robotName = newCommand.robotName;
+    response.pickup.source = newCommand.source;
+    response.pickup.destination = newCommand.destination;
+    response.pickup.amountTotal = newCommand.amountTotal;
+    response.pickup.amount = newCommand.amount;
+    response.pickup.sendLocation = newCommand.sendLocation;
+    ROS_INFO("SL3 : %s", newCommand.sendLocation ? "true" : "false");
+   
+    if(distance != -1 && storageSizeUsed > 0)
+    {
+      //ROS_INFO("check");
+      response.canDo = true;
+      response.distance = int(distance * 1000);
+      response.space = storageSizeUsed;
+    }
+    else
+    {
+      //ROS_INFO("check 2");
+      response.canDo = false;
+      response.distance = distance;
+      response.space = 0;
+    }
+    sendToOtherRobots(response);
+  } 
 }
 
 //Change the checking to use a vector. Sort by a weight, e.g. distance, or space, or canDo
@@ -467,7 +611,7 @@ void responseReceived(multirob_test::r2rpickupresponse response)
     std::vector<int> result = checkInventory(response.pickup.amount);
     int limit = robotResponsescanDo.size();
     std::vector<int> productsPerDest = {0,0,0,0,0};   
-    std::vector<int> amountLeft = {0,0,0,0,0};
+    ROS_INFO("Amount of Robots available for the task %i", limit);
     
     for(int i = 0; i<5; i++)
     {
@@ -483,7 +627,9 @@ void responseReceived(multirob_test::r2rpickupresponse response)
     for(int i = 0; i<5; i++)
     {
       amountLeftTotal = amountLeftTotal + amountLeft[i];
-    }
+    } 
+    ROS_INFO("amountLeftTotal %i", amountLeftTotal);   
+    
     if (amountLeftTotal <= 0)
     {
       if(robotResponsescanDo[0].robot == int(robotName.at(robotName.size() - 1) - 48))
@@ -498,12 +644,16 @@ void responseReceived(multirob_test::r2rpickupresponse response)
     }    
     for(int j = 0; limit > 0 && amountLeftTotal > 0 && response.canDo == true; j++)
     {
+      ROS_INFO("%s Got in the forLoop",robotName.c_str());
       if(robotResponsescanDo[j].robot == int(robotName.at(robotName.size() - 1) - 48))
       {
+        ROS_INFO("%s Got in the IfLoop",robotName.c_str());
         if (j == 0)
         { 
+          ROS_INFO("%s Got in the IfLoop2",robotName.c_str());
           for(int i = 0; i<productsPerDest.size(); i++)
           {
+            ROS_INFO("%s Got in the forLoop2",robotName.c_str());
             productsToCarry = productsToCarry + productsPerDest[i];
           }
           ROS_INFO("%s productsToCarry %i and amountLeftTotal %i",robotName.c_str(), productsToCarry, amountLeftTotal);          
@@ -514,27 +664,21 @@ void responseReceived(multirob_test::r2rpickupresponse response)
           for(int i = 0; i<5; i++)
           {
             productsPerDest[i] = result2[i];
-            //ROS_INFO("%s %i stagee %i productPerDest %i",robotName.c_str(), j, i, productsPerDest[i]);
           } 
-          //amountLeft.clear();
           for(int i = 0; i<5; i++)
           {
-            amountLeft[i] = result2[i+5];
-            //ROS_INFO("%s %i stagee %i amountLeft %i",robotName.c_str(), j, i, amountLeft[i]);
+            amountLeft[i] = result2[i+5];            
           }
-          //TODO For some reason the amountLeftTotal can become negative
           amountLeftTotal = 0;
           for(int i = 0; i<5; i++)
           {
-            amountLeftTotal = amountLeftTotal + amountLeft[i];
-            //ROS_INFO("%s stagee %i amountLeftTotal %i",robotName.c_str(), i, amountLeftTotal);
+            amountLeftTotal = amountLeftTotal + amountLeft[i];            
           }
           for(int i = 0; i<productsPerDest.size(); i++)
           {
             productsToCarry = productsToCarry + productsPerDest[i];
           }
           ROS_INFO("%s productsToCarry %i and amountLeftTotal %i",robotName.c_str(), productsToCarry, amountLeftTotal);
-          //ROS_INFO("amountleft  %i",i, amountLeft);
         }
         runCommand = true;
       }
@@ -550,32 +694,89 @@ void responseReceived(multirob_test::r2rpickupresponse response)
           for(int i = 0; i<5; i++)
           {
             amountLeft[i] = result2[i+5];
-            //ROS_INFO("%s %i stage %i amountLeft %i",robotName.c_str(), j, i, amountLeft[i]);
           }
           amountLeftTotal = 0;
           for(int i = 0; i<5; i++)
           {
             amountLeftTotal = amountLeftTotal + amountLeft[i];
           }
-          //ROS_INFO("%s amountLeftTotal %i",robotName.c_str(), amountLeft[i]);
         }
       }
       limit = limit - 1;
     }
-    if (limit <= 0 && amountLeftTotal > 0)
-    {
-      ROS_INFO("!!!!!!!!!!!!!!!!!!!!!!!!!!Products left: %i!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!", amountLeftTotal);
-    }
+    
     // If the robot got a go on the command they will execute it 
+    //ROS_INFO("I'm %s and I made it here with %i",robotName.c_str(), amountLeftTotal);
+    amountLeftSource = robotResponses[0].pickup.source;
     if(runCommand)
     {
-      boost::thread t{executeCommand, robotResponses[0].pickup.source, robotResponses[0].pickup.destination, productsPerDest};
-      ROS_INFO("Execute Command");
+      if (limit <= 0 && amountLeftTotal > 0)
+      {
+          RobotHasCommand = true;
+          boost::thread t{executeCommand, robotResponses[0].pickup.source, productsPerDest};
+          ROS_INFO("%s will execute the Command with !!!!!!Products Left: %i !!!!!!!",robotName.c_str(), amountLeftTotal);        
+      }
+      else
+      {
+        if(response.pickup.sendLocation)
+        {
+          tf::StampedTransform transform;
+          bool canTransform = true;
+          std::string footprint = "/" + robotName + "/base_footprint";
+          try
+          {
+            listener->lookupTransform(footprint, "/map", ros::Time(0), transform);
+          }
+          catch (tf::TransformException ex)
+          {
+            ROS_ERROR("%s",ex.what());
+            ros::Duration(1.0).sleep();
+            canTransform = false;
+          }
+          //transform.getOrigin().getX();
+          //transform.getOrigin().getY();
+          
+          //geometry_msgs::Quaternion quat;
+          //tf::quaternionTFToMsg(transform.getRotation(), quat); 
+          //quat
+          //ROS_INFO("%s Send Locations to robot X %f Y %f",robotName.c_str(),transform.getOrigin().getX(),transform.getOrigin().getY());
+          //pickupProducts.publish(ddsadsatransform);
+            ROS_INFO("%s I can help you",robotName.c_str());
+            multirob_test::pickupProducts msg;
+            msg.robot = response.pickup.robotName;
+            msg.robotX = transform.getOrigin().getX();  
+            msg.robotY = transform.getOrigin().getY();
+            pickupProducts.publish(msg);               
+        } 
+        else
+        {
+          RobotHasCommand = true;
+          boost::thread t{executeCommand, robotResponses[0].pickup.source, productsPerDest};
+          ROS_INFO("%s will execute the Command",robotName.c_str());
+        }
+      }
     }  
     robotResponses.clear();
-    robotResponsescanDo.clear();
+    robotResponsescanDo.clear();    
   }
   
+}
+
+void pickupProductsResponseReceived(multirob_test::pickupProducts response)
+{
+  pickupProductsResponse data;
+  data.robot = response.robot;
+  data.robotX = response.robotX;
+  data.robotY = response.robotY;
+  
+  if(data.robot == robotName.c_str())
+  {
+    ROS_INFO("%s Its me, Ihave to do something",robotName.c_str());  
+  }
+  else
+  {
+    ROS_INFO("%s Not me so dont do shit",robotName.c_str());  
+  } 
 }
 
 //Callback function when a new command msg is received
@@ -592,11 +793,14 @@ void commandReceived(multirob_test::cmdPickup command)
     amountTotal2 = amountTotal2 + command.amount[i];
   } 
   ROS_INFO("CommandReceived amountTotal %i",amountTotal2); 
-
+  newCommand.robotName = command.robotName;
   newCommand.source = command.source;
   newCommand.destination = command.destination;
   newCommand.amountTotal = amountTotal2;
   newCommand.amount = command.amount;
+  newCommand.sendLocation = command.sendLocation;
+  ROS_INFO("SL: %s", command.sendLocation ? "true" : "false");
+  
 
   //Launch a new thread with these functions. @TODO Keep track of the amount of threads spun up. This can be as simple as a mutex to prevent a new thread from launching when the old one isn't finished yet.
   if(RobotHasCommand)
@@ -622,8 +826,15 @@ int main(int argc, char** argv)
 
   ros::Subscriber pickup_command = node.subscribe("/pickup_command", 10, commandReceived);
   robotComms = node.advertise<multirob_test::r2rpickupresponse>( "/pickup_responses", 0 );
+  
   ros::Subscriber pick_responses = node.subscribe("/pickup_responses", 10, responseReceived);
-
+  robotMsg = node.advertise<multirob_test::cmdPickup>( "/pickup_command", 0 );
+  
+  ros::Subscriber pick_message = node.subscribe("/pickup_message", 10, pickupProductsResponseReceived);
+  pickupProducts = node.advertise<multirob_test::pickupProducts>( "/pickup_message", 0 );
+  
+  //geometry_msgs::Pose
+  
   listener = new(tf::TransformListener);
 
   if (node.hasParam("robot_name"))
