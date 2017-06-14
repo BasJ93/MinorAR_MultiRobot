@@ -30,8 +30,9 @@ This paper details the design and implementation of a decentralized multi-robot 
 The decentralized multi-robot logistics project is one of the main projects of the Adaptive Robotics Minor at Fontys Hogeschool Engineering, in the 2016-2017 academic year. The goal of this project is to develop a system, both hardware and software, that is capable of transporting product between a warehouse and production locations in an Industry 4.0 setting. The system can be a replacement for a traditional conveyor belt, or can be used as a flexible addition to an existing conveyor system.
 
 \section{Hardware}
-
+The turtlebots must transport carriages from one point in a warehouse/factory to another point. In addition to this it was decided that the turtlebots had to be able to transfer carriages from one bot to another. A morphological chart was used to create multiple solutions for this task. The solutions that were most promising and realistic were worked out with more detail. Initially the turtlebots were meant to have multiple specializations. These specializations were also in the morphological chart. Two of these specializations were chosen, but in the end, it was financially and time-wise not feasible to implement both specializations. Hence only one concept was realized.
 \subsection{Stackup}
+The position of the camera was moved to the front of the turtlebot, beneath the disk on top of which the laptop is placed. The system that hold the carriages and is capable of transferring the carriages is mounted on top of the disk above the laptop.
 \begin{figure}[htp]
 \centering
 \includegraphics[width=\columnwidth]{turtle_design}
@@ -39,8 +40,18 @@ The decentralized multi-robot logistics project is one of the main projects of t
 \label{MechanicalDesign}
 \end{figure}
 
+Six grippers are mounted on the turtlebot, each can carry a single carriage. To align the carriages for transfer the grippers can revolve around the turtlebot. For this purpose, the grippers and a stepper motor are mounted on top of a Lazy Suzan bearing. A pinion on the motor and a gear make it possible for the bearing to revolve. A reed contact and a magnet are used to keep track of the position of the grippers instead of an encoder. A slip ring is used to keep the electrical cables from getting entangled or breaking lose because of the movement. This design is displayed in figure \ref{MechanicalDesign}.
+
 \subsection{Gripper}
-\lipsum[4]
+When a carriage is pushed into the gripper a plate with an axis attached to it will be pushed back. Pushing the plate back will cause the fingers to grip the carriage. The gripper will be mechanically locked by the axis, to be released by a servo. When released a spring pushes the plate back, causing the gripper to open. The carriages will be pushed into the carriage by driving the turtlebot against it. To get the alignment right the gripper is revolved around the turtlebot first.
+
+The carriages are a standard size of 50*50*100mm and are intended to carry small parts such as bolts. A photograph of the gripper is shown in figure \ref{Gripper}.
+\begin{figure}[htp]
+\centering
+\includegraphics[width=\columnwidth]{gripper}
+\caption{Gripper}
+\label{Gripper}
+\end{figure}
 
 \section{Software}
 During this project a team of two students has developed the software making the decisions on the robots. This software is designed to receive commands from one or more workstations, and have to robots decide which robot should execute a command. The robots have the ability to request help from one another when more product have to be transported than a single robot can carry, or it is beneficial to transfer one or more products between two robots to get the products to their destination faster.
@@ -71,9 +82,9 @@ Figure \ref{SimulatedWorldMap} shows the map of this virtual world generated wit
 \subsection{Software scales to more robots}
 The software has been designed to scale to an unlimited number of robots. The only requirement is that the systems running the robots have enough RAM to store all the information for the robots. The software has been tested in the simulation with four robots.
 \subsection{Software performs better when using a big map}
-\lipsum[15-16]
+
 \subsection{Replace turtlebots}
-\lipsum[10-11]
+
 
 \bibliographystyle{IEEEtran}
 \bibliography{paper_multirobot_logistics}
