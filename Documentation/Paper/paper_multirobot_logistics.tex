@@ -81,10 +81,8 @@ Within this simulation, the complete robots are simulated in a fully simulated w
 Figure \ref{SimulatedWorldMap} shows the map of this virtual world generated with gmapping SLAM package\cite{SLAMGmapping}, and edited to expand the known area. The white area represents the know area, grey represents unknown and the black markings are the detected obstacles.
 \subsection{Software scales to more robots}
 The software has been designed to scale to an unlimited number of robots. The only requirement is that the systems running the robots have enough RAM to store all the information for the robots. The software has been tested in the simulation with four robots.
-\subsection{Software performs better when using a big map}
-
 \subsection{Replace turtlebots}
-
+During testing, it was determined that the turtlebots are not suitable for this application. The odometry of the turtlebots is lacking, and very error prone. The Orbbec Astra RGBD camera placed on the turtlebot is not very suitable as a simulated laserscanner, as the resolution and update rate are to low to provide detailed information. It is therefore recommended to replace the turtlebots with a more suitable robot platform if this system is to be taken further than the proof of concept phase.
 
 \bibliographystyle{IEEEtran}
 \bibliography{paper_multirobot_logistics}
