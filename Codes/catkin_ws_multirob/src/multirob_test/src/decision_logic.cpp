@@ -27,6 +27,7 @@
 #include <multirob_test/cmdPickup.h>
 #include <multirob_test/r2rpickupresponse.h>
 #include <multirob_test/pickupProducts.h>
+#include <multirob_test/transfer.h>
 
 //The headers to access files.
 #include <iostream>
@@ -39,11 +40,16 @@
 tf::TransformListener* listener = NULL;
 
 //Define a struct to keep the pickup commands for the robot
+struct transferstruct
+{
+  std::string robotName;
+  std::vector<int> amount;
+};
+
 struct pickupProductsResponse
 {
   std::string robot;
-  int robotX;
-  int robotY;
+  geometry_msgs::Pose pose;
 };
 
 struct robotPickupCommand {
@@ -63,6 +69,8 @@ volatile robotPickupCommand previousPickupCommand;
 std::vector<multirob_test::r2rpickupresponse> robotResponses;
 
 volatile bool RobotHasCommand = false;
+bool transferComming = false;
+std::vector<int> amountToCarry = {0,0,0,0,0};
 
 std::vector<std::string> dockNames;
 //Design a struct to store the data for a location, then build a vector with this struct.
@@ -76,6 +84,7 @@ typedef actionlib::SimpleActionClient<move_base_msgs::MoveBaseAction> MoveBaseCl
 ros::Publisher robotComms; //This would not be thread safe
 ros::Publisher robotMsg;
 ros::Publisher pickupProducts;
+ros::Publisher transfer;
 
 std::string robotName;
 int numberOfRobots;
@@ -133,53 +142,9 @@ void moveToLocation(geometry_msgs::Pose pose)
   msg.sendLocation = false; 
   robotMsg.publish(msg);
 }*/
-
-void executeCommand(std::string source, std::vector<int> amount)
+void moveToDestinations(std::vector<int> amount)
 {
-  ROS_INFO("%s will execute the command.", robotName.c_str());
   int amountLeftTotal = 0;
-
-  RobotHasCommand = true;
-  for(int i=0; i<dockNames.size(); i++)
-  {
-    if(source.compare(dockNames[i]) == 0)
-    {
-      moveToLocation(dockLocations[i]);
-      break;
-    }
-  }
-  productsLoaded = productsToCarry;
-  productsToCarry =  0;
-  ROS_INFO("%s productsLoaded %i", robotName.c_str(), productsLoaded);
-  int amountLocations = 0;
-  for(int i=0; i<amount.size();i++)
-  {
-    if(amount[i] > 0)
-    {
-      amountLocations = amountLocations + 1;
-    }
-    else
-    {
-      amountLocations = amountLocations;
-    }
-  }
-  ROS_INFO("%s amountLocations %i", robotName.c_str(), amountLocations);  
-  
-  if(amountLocations ==2)
-  {
-    ROS_INFO("%s I need help, can anyone transfer",robotName.c_str());
-    multirob_test::cmdPickup msg;
-    msg.robotName = robotName;
-    msg.source = amountLeftSource;
-    msg.destination= "";
-    msg.product= "";
-    msg.amountTotal= 0;
-    msg.amount= amount;
-    msg.sendLocation = true; 
-    robotMsg.publish(msg);
-  }
-  
-  
   for(int i = 0; i < amount.size(); i++)
   {
     if(amount[i] == 0)
@@ -217,15 +182,79 @@ void executeCommand(std::string source, std::vector<int> amount)
     msg.sendLocation = false; 
     robotMsg.publish(msg);
   }
-  
   else
   {
     ROS_INFO("%s Robot is able to receive new command", robotName.c_str());
+  }
+
+}
+
+void executeCommand(std::string source, std::vector<int> amount)
+{
+  ROS_INFO("%s will execute the command.", robotName.c_str());
+  
+  RobotHasCommand = true;
+  for(int i=0; i<dockNames.size(); i++)
+  {
+    if(source.compare(dockNames[i]) == 0)
+    {
+      moveToLocation(dockLocations[i]);
+      break;
+    }
+  }
+  productsLoaded = productsToCarry;
+  productsToCarry =  0;
+  ROS_INFO("%s productsLoaded %i", robotName.c_str(), productsLoaded);
+  int amountLocations = 0;
+  for(int i=0; i<amount.size();i++)
+  {
+    if(amount[i] > 0)
+    {
+      amountLocations = amountLocations + 1;
+    }
+    else
+    {
+      amountLocations = amountLocations;
+    }
+  }
+  ROS_INFO("%s amountLocations %i", robotName.c_str(), amountLocations);  
+  amountToCarry = amount;
+  
+  if(amountLocations ==2)
+  {
+    ROS_INFO("%s I need help, can anyone transfer",robotName.c_str());
+    multirob_test::cmdPickup msg;
+    msg.robotName = robotName;
+    msg.source = amountLeftSource;
+    msg.destination= "";
+    msg.product= "";
+    msg.amountTotal= 0;
+    msg.amount= amount;
+    msg.sendLocation = true; 
+    robotMsg.publish(msg);
+    
+  }
+  else
+  {
+    moveToDestinations(amount);
   }
 }
 
 //Function to calculate the disatance from the robot to a given target location, in the x,y and quaternion notation. Returns a float representing the lenght of the path.\
 //TODO the distance to the goal is sometimes closes because the robot isn't sure of its position, this is a problem on small scale but on big scale this would not be a problem. 
+void pickupLogic(geometry_msgs::Pose pose)
+{
+  
+  ROS_INFO("%s whoop",robotName.c_str());
+  moveToLocation(pose);
+  ROS_INFO("%s I'm there lets transfer",robotName.c_str());
+    multirob_test::transfer msg;
+    msg.robotName = robotName;
+    msg.amount= amountToCarry; 
+    transfer.publish(msg);
+  //moveToDestination(amount);
+}
+
 float calcGoalDistance(geometry_msgs::Pose pose)
 {
   //Create a nodehandle and attach the make_plan client to the node.
@@ -720,6 +749,7 @@ void responseReceived(multirob_test::r2rpickupresponse response)
       {
         if(response.pickup.sendLocation)
         {
+          geometry_msgs::Pose pose;
           tf::StampedTransform transform;
           bool canTransform = true;
           std::string footprint = "/" + robotName + "/base_footprint";
@@ -733,20 +763,42 @@ void responseReceived(multirob_test::r2rpickupresponse response)
             ros::Duration(1.0).sleep();
             canTransform = false;
           }
-          //transform.getOrigin().getX();
-          //transform.getOrigin().getY();
-          
-          //geometry_msgs::Quaternion quat;
-          //tf::quaternionTFToMsg(transform.getRotation(), quat); 
-          //quat
-          //ROS_INFO("%s Send Locations to robot X %f Y %f",robotName.c_str(),transform.getOrigin().getX(),transform.getOrigin().getY());
-          //pickupProducts.publish(ddsadsatransform);
+          if(canTransform)
+          {
+            pose.position.x =transform.getOrigin().getX();
+            pose.position.y =transform.getOrigin().getY();
+            geometry_msgs::Quaternion quat;
+            tf::quaternionTFToMsg(transform.getRotation(), quat); 
+            pose.orientation = quat;
+            
             ROS_INFO("%s I can help you",robotName.c_str());
             multirob_test::pickupProducts msg;
             msg.robot = response.pickup.robotName;
-            msg.robotX = transform.getOrigin().getX();  
-            msg.robotY = transform.getOrigin().getY();
-            pickupProducts.publish(msg);               
+            msg.pose = pose;
+            pickupProducts.publish(msg); 
+            transferComming = true;
+          }
+          else
+          {
+            ROS_INFO("%s can't transform",robotName.c_str());
+          }
+          /*
+          transform.getOrigin().getX();
+          transform.getOrigin().getY();
+          
+          geometry_msgs::Quaternion quat;
+          tf::quaternionTFToMsg(transform.getRotation(), quat); 
+          quat
+          ROS_INFO("%s Send Locations to robot X %f Y %f",robotName.c_str(),transform.getOrigin().getX(),transform.getOrigin().getY());
+          pickupProducts.publish(ddsadsatransform);
+          ROS_INFO("%s I can help you",robotName.c_str());
+          multirob_test::pickupProducts msg;
+          msg.robot = response.pickup.robotName;
+          msg.robotX = transform.getOrigin().getX();  
+          msg.robotY = transform.getOrigin().getY();
+          msg.pose = transform;
+          pickupProducts.publish(msg); 
+          transferComming = true; */             
         } 
         else
         {
@@ -762,16 +814,117 @@ void responseReceived(multirob_test::r2rpickupresponse response)
   
 }
 
+void transferLogic(std::string robotName, std::vector<int> amount)
+{
+  transferstruct data;
+  data.robotName = robotName;
+  data.amount = amount;
+  int amountLocations = 0;
+  
+  
+  for(int i=0; i<data.amount.size();i++)
+  {
+    if(data.amount[i] > 0)
+    {
+      amountLocations = amountLocations + 1;
+    }
+    else
+    {
+      amountLocations = amountLocations;
+    }
+  }
+  
+  if(transferComming)
+  {
+    if(amountLocations == 2)
+    {
+      bool getOut = false;
+      for(int i =0; i< data.amount.size() ; i++)
+      {
+        if(getOut == false)
+        {
+          if(data.amount[i]>0)
+          {
+            amountToCarry[i] = data.amount[i];
+            getOut = true;
+          }
+          else 
+          {
+            amountToCarry[i] = amountToCarry[i];
+          }
+        }
+      } 
+    }
+    transferComming = false;
+    moveToDestinations(amountToCarry);
+  }
+  if(data.robotName == robotName)
+  {
+    if(amountLocations ==2)
+    {
+      bool getOut = false;
+      for(int i =0; i< data.amount.size() ; i++)
+      {
+        if(getOut == false)
+        {
+          if(data.amount[i] > 0)
+          {
+            amountToCarry[i] = 0;
+            getOut = true;
+          }
+          else 
+          {
+            amountToCarry[i] = amountToCarry[i];
+          }
+        }
+      }
+    }
+    moveToDestinations(amountToCarry);
+  }    
+}
+
+void transferReceived(multirob_test::transfer response)
+{
+  transferstruct data;
+  //std::vector<int> amount = {0,0,0,0,0};;
+  //std::vector<int> amountMe = {0,0,0,0,0};
+  data.robotName = response.robotName;
+  data.amount = response.amount;  
+  if(transferComming)
+  {
+    transferLogic(data.robotName, data.amount);
+  }
+  if(data.robotName == robotName.c_str())
+  {
+    transferLogic(data.robotName, data.amount);
+  }
+  else
+  {
+    ROS_INFO("%s dont need to transfer anything",robotName.c_str());  
+  }
+}
+
 void pickupProductsResponseReceived(multirob_test::pickupProducts response)
 {
   pickupProductsResponse data;
   data.robot = response.robot;
-  data.robotX = response.robotX;
+  data.pose = response.pose;
+  /*data.robotX = response.robotX;
   data.robotY = response.robotY;
+  
+  geometry_msgs::Pose pose;
+  pose.position.x = data.robotX;
+  pose.position.y = data.robotY;
+  pose.position.z = 0.0;
+  pose.orientation.x = 0.0;
+  pose.orientation.y = 0.0;
+  pose.orientation.z = 0.0;
+  pose.orientation.w = 0.0;*/
   
   if(data.robot == robotName.c_str())
   {
-    ROS_INFO("%s Its me, Ihave to do something",robotName.c_str());  
+    ROS_INFO("%s Its me, I have to do something",robotName.c_str());
+    pickupLogic(data.pose);  
   }
   else
   {
@@ -832,6 +985,9 @@ int main(int argc, char** argv)
   
   ros::Subscriber pick_message = node.subscribe("/pickup_message", 10, pickupProductsResponseReceived);
   pickupProducts = node.advertise<multirob_test::pickupProducts>( "/pickup_message", 0 );
+  
+  ros::Subscriber pick_transfer = node.subscribe("/pickup_transfer", 10, transferReceived);
+  transfer = node.advertise<multirob_test::transfer>( "/pickup_transfer", 0 );
   
   //geometry_msgs::Pose
   

@@ -58,6 +58,7 @@ find_package(catkin REQUIRED COMPONENTS
    cmdPickup.msg
    pickupProducts.msg
    r2rpickupresponse.msg
+   transfer.msg
  )
 
 ## Generate services in the 'srv' folder
