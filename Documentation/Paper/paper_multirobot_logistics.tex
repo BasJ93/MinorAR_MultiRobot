@@ -54,7 +54,7 @@ The carriages are a standard size of 50 by 50 by 100 millimetre and are intended
 \end{figure}
 
 \section{Software}
-During this project a team of two students has developed the software making the decisions on the robots. This software is designed to receive commands from one or more workstations, and have to robots decide which robot should execute a command. The robots have the ability to request help from one another when more product have to be transported than a single robot can carry, or it is beneficial to transfer one or more products between two robots to get the products to their destination faster.
+During this project a team of two students has developed the software making the decisions on the robots, build on top of the Robot Operating System. This software is designed to receive commands from one or more workstations, and have the robots decide which robot should execute a command. The robots have the ability to request help from one another when more products have to be transported than a single robot can carry, or it is beneficial to transfer one or more products between two robots to get the products to their destination faster.
 
 \subsection{Distance calulation}
 The robots make decisions based on their available inventory space, and the distance between the robot and the goal. The distance of the planned path is calculated using equation \ref{eq_pathlength}. This means that for each point in the path, the distance to the next point is calculated. The length is the sum of these distances.
@@ -82,7 +82,7 @@ Figure \ref{SimulatedWorldMap} shows the map of this virtual world generated wit
 \subsection{Software scales to more robots}
 The software has been designed to scale to an unlimited number of robots. The only requirement is that the systems running the robots have enough RAM to store all the information for the robots. The software has been tested in the simulation with four robots.
 \subsection{Replace turtlebots}
-During testing, it was determined that the turtlebots are not suitable for this application. The odometry of the turtlebots is lacking, and very error prone. The Orbbec Astra RGBD camera placed on the turtlebot is not very suitable as a simulated laserscanner, as the resolution and update rate are to low to provide detailed information. It is therefore recommended to replace the turtlebots with a more suitable robot platform if this system is to be taken further than the proof of concept phase.
+During testing, it was determined that the turtlebots are not suitable for this application. The odometry of the turtlebots is lacking, and very error prone. The Orbbec Astra RGBD camera placed on the turtlebot is not very suitable as a simulated laserscanner, as the resolution and update rate are too low to provide detailed information. It is therefore recommended to replace the turtlebots with a more suitable robot platform if this system is to be taken further than the proof of concept phase.
 
 \bibliographystyle{IEEEtran}
 \bibliography{paper_multirobot_logistics}
