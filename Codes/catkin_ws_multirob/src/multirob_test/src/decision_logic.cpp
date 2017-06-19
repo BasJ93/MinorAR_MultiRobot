@@ -4,6 +4,8 @@
 /*  Fontys 2017                         */
 /****************************************/
 
+//@TODO: Move functions to seperate file. Replace all structs with the corresponding msg. Remove all commented out code. Replace debug text with proper text outputs.
+
 #include <ros/ros.h>
 #include <ros/package.h>
 #include <boost/thread.hpp>
@@ -39,33 +41,6 @@
 
 tf::TransformListener* listener = NULL;
 
-//Define a struct to keep the pickup commands for the robot
-struct transferstruct
-{
-  std::string robotName;
-  std::vector<int> amount;
-};
-
-struct pickupProductsResponse
-{
-  std::string robot;
-  geometry_msgs::Pose pose;
-};
-
-struct robotPickupCommand {
-  std::string robotName;
-  std::string source;
-  std::string destination;
-  std::string product;
-  int amountTotal;
-  std::vector<int> amount;
-  bool sendLocation;
-  bool done;
-};
-
-//Keep a records of the previous/active pickup command
-volatile robotPickupCommand previousPickupCommand;
-
 std::vector<multirob_test::r2rpickupresponse> robotResponses;
 
 volatile bool RobotHasCommand = false;
@@ -93,6 +68,7 @@ bool sim;
 int productsToCarry;
 int productsLoaded;
 
+//Helper function for std::sort to sort on user defined variables in an object.
 bool sortByDistance(multirob_test::r2rpickupresponse response1, multirob_test::r2rpickupresponse response2)
 {
   return response1.distance < response2.distance;
@@ -142,6 +118,7 @@ void moveToLocation(geometry_msgs::Pose pose)
   msg.sendLocation = false; 
   robotMsg.publish(msg);
 }*/
+
 void moveToDestinations(std::vector<int> amount)
 {
   productsLoaded = 0;
@@ -209,9 +186,6 @@ void executeCommand(std::string source, std::vector<int> amount)
       break;
     }
   }
-  //productsLoaded = productsToCarry;
-  //productsToCarry =  0;
-  //ROS_INFO("%s productsLoaded %i", robotName.c_str(), productsLoaded);
   int amountLocations = 0;
   for(int i=0; i<amount.size();i++)
   {
@@ -247,7 +221,7 @@ void executeCommand(std::string source, std::vector<int> amount)
 }
 
 //Function to calculate the disatance from the robot to a given target location, in the x,y and quaternion notation. Returns a float representing the lenght of the path.\
-//TODO the distance to the goal is sometimes closes because the robot isn't sure of its position, this is a problem on small scale but on big scale this would not be a problem. 
+//TODO the distance to the goal is sometimes closer because the robot isn't sure of its position, this is a problem on small scale but on big scale this would not be a problem. 
 void pickupLogic(geometry_msgs::Pose pose)
 {
   
@@ -477,25 +451,12 @@ int sendToOtherRobots(multirob_test::r2rpickupresponse response)
   robotComms.publish(response);
 }
 
-void checkWithExisting(robotPickupCommand command)
+void checkWithExisting(multirob_test::cmdPickup command)
 {
   ROS_INFO("%s had a command running already.",robotName.c_str());
   
   float distance = 0;
-  
-  /*for(int i=0; i<5; i++)
-  {
-    if(command.source.compare(dockNames[i]) == 0)
-    {
-      distance = calcGoalDistance(dockLocations[i]);
-      ROS_INFO("Robot %i :Distance to goal %s: %f", (robotName.at(robotName.size() - 1)) - 48, dockNames[i].c_str(), distance);
-      break;
-    }
-    else
-    {
-      distance = -1;
-    }
-  }*/ 
+
   distance = -1;
   int amountTotal1 = 0;
   for(int i = 0; i < command.amount.size(); i++)
@@ -510,7 +471,6 @@ void checkWithExisting(robotPickupCommand command)
   response.pickup.amountTotal = amountTotal1;
   response.pickup.amount = command.amount;
   response.pickup.sendLocation = command.sendLocation;
-  //ROS_INFO("SL4: %s", command.sendLocation ? "true" : "false");
 
   response.canDo = false;
 
@@ -520,10 +480,16 @@ void checkWithExisting(robotPickupCommand command)
   sendToOtherRobots(response);
 }
 
-void startNewCommand(robotPickupCommand newCommand)
+void startNewCommand(multirob_test::cmdPickup newCommand)
 {
   float distance =0;
   int storageSizeUsed = 0;
+  int amountTotal2 = 0;
+  for(int i = 0; i < newCommand.amount.size(); i++)
+  {
+    amountTotal2 = amountTotal2 + newCommand.amount[i];
+  } 
+  ROS_INFO("CommandReceived amountTotal %i",amountTotal2); 
   if(newCommand.sendLocation == true)
   {
     ROS_INFO("%s Calculate the distance to locations",robotName.c_str());
@@ -546,7 +512,7 @@ void startNewCommand(robotPickupCommand newCommand)
     response.pickup.robotName = newCommand.robotName;
     response.pickup.source = newCommand.source;
     response.pickup.destination = newCommand.destination;
-    response.pickup.amountTotal = newCommand.amountTotal;
+    response.pickup.amountTotal = amountTotal2;
     response.pickup.amount = newCommand.amount;
     response.pickup.sendLocation = newCommand.sendLocation;
     //ROS_INFO("SL2: %s", newCommand.sendLocation ? "true" : "false");
@@ -591,17 +557,15 @@ void startNewCommand(robotPickupCommand newCommand)
     {
       storageSizeUsed = storageSizeUsed + space[i];
     }
-    //ROS_INFO("startNewCommand storageSizeUsed %i", storageSizeUsed);
    
     multirob_test::r2rpickupresponse response;
     response.robot = int(robotName.at(robotName.size() - 1)) - 48;
     response.pickup.robotName = newCommand.robotName;
     response.pickup.source = newCommand.source;
     response.pickup.destination = newCommand.destination;
-    response.pickup.amountTotal = newCommand.amountTotal;
+    response.pickup.amountTotal = amountTotal2;
     response.pickup.amount = newCommand.amount;
     response.pickup.sendLocation = newCommand.sendLocation;
-    //ROS_INFO("SL3 : %s", newCommand.sendLocation ? "true" : "false");
    
     if(distance != -1 && storageSizeUsed > 0)
     {
@@ -741,7 +705,6 @@ void responseReceived(multirob_test::r2rpickupresponse response)
     }
     
     // If the robot got a go on the command they will execute it 
-    //ROS_INFO("I'm %s and I made it here with %i",robotName.c_str(), amountLeftTotal);
     amountLeftSource = robotResponses[0].pickup.source;
     if(runCommand)
     {
@@ -787,24 +750,7 @@ void responseReceived(multirob_test::r2rpickupresponse response)
           else
           {
             ROS_INFO("%s can't transform",robotName.c_str());
-          }
-          /*
-          transform.getOrigin().getX();
-          transform.getOrigin().getY();
-          
-          geometry_msgs::Quaternion quat;
-          tf::quaternionTFToMsg(transform.getRotation(), quat); 
-          quat
-          ROS_INFO("%s Send Locations to robot X %f Y %f",robotName.c_str(),transform.getOrigin().getX(),transform.getOrigin().getY());
-          pickupProducts.publish(ddsadsatransform);
-          ROS_INFO("%s I can help you",robotName.c_str());
-          multirob_test::pickupProducts msg;
-          msg.robot = response.pickup.robotName;
-          msg.robotX = transform.getOrigin().getX();  
-          msg.robotY = transform.getOrigin().getY();
-          msg.pose = transform;
-          pickupProducts.publish(msg); 
-          transferComming = true; */             
+          }           
         } 
         else
         {
@@ -820,11 +766,8 @@ void responseReceived(multirob_test::r2rpickupresponse response)
   
 }
 
-void transferLogic(std::string robotName, std::vector<int> amount)
+void transferLogic(multirob_test::transfer data)
 {
-  transferstruct data;
-  data.robotName = robotName;
-  data.amount = amount;
   int amountLocations = 0;
   
   for(int i=0; i<data.amount.size();i++)
@@ -936,18 +879,13 @@ void transferLogic(std::string robotName, std::vector<int> amount)
 
 void transferReceived(multirob_test::transfer response)
 {
-  transferstruct data;
-  //std::vector<int> amount = {0,0,0,0,0};;
-  //std::vector<int> amountMe = {0,0,0,0,0};
-  data.robotName = response.robotName;
-  data.amount = response.amount;  
   if(transferComming)
   {
-    transferLogic(data.robotName, data.amount);
+    transferLogic(response);
   }
-  if(data.robotName == robotName.c_str())
+  if(response.robotName == robotName.c_str())
   {
-    transferLogic(data.robotName, data.amount);
+    transferLogic(response);
   }
   else
   {
@@ -957,25 +895,10 @@ void transferReceived(multirob_test::transfer response)
 
 void pickupProductsResponseReceived(multirob_test::pickupProducts response)
 {
-  pickupProductsResponse data;
-  data.robot = response.robot;
-  data.pose = response.pose;
-  /*data.robotX = response.robotX;
-  data.robotY = response.robotY;
-  
-  geometry_msgs::Pose pose;
-  pose.position.x = data.robotX;
-  pose.position.y = data.robotY;
-  pose.position.z = 0.0;
-  pose.orientation.x = 0.0;
-  pose.orientation.y = 0.0;
-  pose.orientation.z = 0.0;
-  pose.orientation.w = 0.0;*/
-  
-  if(data.robot == robotName.c_str())
+  if(response.robot == robotName.c_str())
   {
     ROS_INFO("%s Its me, I have to do something",robotName.c_str());
-    pickupLogic(data.pose);  
+    pickupLogic(response.pose);  
   }
   else
   {
@@ -986,37 +909,16 @@ void pickupProductsResponseReceived(multirob_test::pickupProducts response)
 //Callback function when a new command msg is received
 void commandReceived(multirob_test::cmdPickup command)
 {
-  //Check if the robot is already executing a command
-  //If true, go to the function checking the possibility of adding the command
-  //If false, respond to the group, and start executing the command
-  robotPickupCommand newCommand;
-
-  int amountTotal2 = 0;
-  for(int i = 0; i < command.amount.size(); i++)
-  {
-    amountTotal2 = amountTotal2 + command.amount[i];
-  } 
-  ROS_INFO("CommandReceived amountTotal %i",amountTotal2); 
-  newCommand.robotName = command.robotName;
-  newCommand.source = command.source;
-  newCommand.destination = command.destination;
-  newCommand.amountTotal = amountTotal2;
-  newCommand.amount = command.amount;
-  newCommand.sendLocation = command.sendLocation;
-  //ROS_INFO("SL: %s", command.sendLocation ? "true" : "false");
-  
-
-  //Launch a new thread with these functions. @TODO Keep track of the amount of threads spun up. This can be as simple as a mutex to prevent a new thread from launching when the old one isn't finished yet.
   if(RobotHasCommand)
   {
     ROS_INFO("%s Go to Check",robotName.c_str());
-    boost::thread t{checkWithExisting, newCommand};//, arg1, arg2}; //Add values to pass
+    boost::thread t{checkWithExisting, command};//, arg1, arg2}; //Add values to pass
     t.detach();
   }
   else
   {
     ROS_INFO("%s Go to NewCommand",robotName.c_str());
-    boost::thread t{startNewCommand, newCommand};//, arg1, arg2}; //Add values to pass
+    boost::thread t{startNewCommand, command};//, arg1, arg2}; //Add values to pass
   }
 }
 
