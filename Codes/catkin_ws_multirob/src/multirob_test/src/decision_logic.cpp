@@ -144,7 +144,14 @@ void moveToLocation(geometry_msgs::Pose pose)
 }*/
 void moveToDestinations(std::vector<int> amount)
 {
+  productsLoaded = 0;
   int amountLeftTotal = 0;
+  for(int i =0; i < amount.size(); i++)
+  {
+    productsLoaded = productsLoaded + amount[i];
+  }
+  ROS_INFO("%s productsLoaded %i", robotName.c_str(), productsLoaded);
+  
   for(int i = 0; i < amount.size(); i++)
   {
     if(amount[i] == 0)
@@ -202,9 +209,9 @@ void executeCommand(std::string source, std::vector<int> amount)
       break;
     }
   }
-  productsLoaded = productsToCarry;
-  productsToCarry =  0;
-  ROS_INFO("%s productsLoaded %i", robotName.c_str(), productsLoaded);
+  //productsLoaded = productsToCarry;
+  //productsToCarry =  0;
+  //ROS_INFO("%s productsLoaded %i", robotName.c_str(), productsLoaded);
   int amountLocations = 0;
   for(int i=0; i<amount.size();i++)
   {
@@ -220,7 +227,7 @@ void executeCommand(std::string source, std::vector<int> amount)
   ROS_INFO("%s amountLocations %i", robotName.c_str(), amountLocations);  
   amountToCarry = amount;
   
-  if(amountLocations ==2)
+  if(amountLocations > 1)
   {
     ROS_INFO("%s I need help, can anyone transfer",robotName.c_str());
     multirob_test::cmdPickup msg;
@@ -232,7 +239,6 @@ void executeCommand(std::string source, std::vector<int> amount)
     msg.amount= amount;
     msg.sendLocation = true; 
     robotMsg.publish(msg);
-    
   }
   else
   {
@@ -504,7 +510,7 @@ void checkWithExisting(robotPickupCommand command)
   response.pickup.amountTotal = amountTotal1;
   response.pickup.amount = command.amount;
   response.pickup.sendLocation = command.sendLocation;
-  ROS_INFO("SL4: %s", command.sendLocation ? "true" : "false");
+  //ROS_INFO("SL4: %s", command.sendLocation ? "true" : "false");
 
   response.canDo = false;
 
@@ -543,7 +549,7 @@ void startNewCommand(robotPickupCommand newCommand)
     response.pickup.amountTotal = newCommand.amountTotal;
     response.pickup.amount = newCommand.amount;
     response.pickup.sendLocation = newCommand.sendLocation;
-    ROS_INFO("SL2: %s", newCommand.sendLocation ? "true" : "false");
+    //ROS_INFO("SL2: %s", newCommand.sendLocation ? "true" : "false");
        
     if(distance != -1)
     {
@@ -595,18 +601,18 @@ void startNewCommand(robotPickupCommand newCommand)
     response.pickup.amountTotal = newCommand.amountTotal;
     response.pickup.amount = newCommand.amount;
     response.pickup.sendLocation = newCommand.sendLocation;
-    ROS_INFO("SL3 : %s", newCommand.sendLocation ? "true" : "false");
+    //ROS_INFO("SL3 : %s", newCommand.sendLocation ? "true" : "false");
    
     if(distance != -1 && storageSizeUsed > 0)
     {
-      //ROS_INFO("check");
+      ROS_INFO("check");
       response.canDo = true;
       response.distance = int(distance * 1000);
       response.space = storageSizeUsed;
     }
     else
     {
-      //ROS_INFO("check 2");
+      ROS_INFO("check 2");
       response.canDo = false;
       response.distance = distance;
       response.space = 0;
@@ -821,7 +827,6 @@ void transferLogic(std::string robotName, std::vector<int> amount)
   data.amount = amount;
   int amountLocations = 0;
   
-  
   for(int i=0; i<data.amount.size();i++)
   {
     if(data.amount[i] > 0)
@@ -836,7 +841,7 @@ void transferLogic(std::string robotName, std::vector<int> amount)
   
   if(transferComming)
   {
-    if(amountLocations == 2)
+    if(amountLocations > 1 && amountLocations < 4)
     {
       bool getOut = false;
       for(int i =0; i< data.amount.size() ; i++)
@@ -854,14 +859,40 @@ void transferLogic(std::string robotName, std::vector<int> amount)
           }
         }
       } 
+      transferComming = false;
+      moveToDestinations(amountToCarry);
     }
-    transferComming = false;
-    moveToDestinations(amountToCarry);
+   
+    if(amountLocations > 3)
+    {
+      if(transferComming)
+      {
+        int getOut =0;
+        for(int i =0; i< data.amount.size() ; i++)
+        {
+          if(getOut < 2)
+          {
+            if(data.amount[i] > 0)
+            {
+              amountToCarry[i] = data.amount[i];
+              getOut = getOut +1;
+            }
+            else 
+            {
+              amountToCarry[i] = amountToCarry[i];
+            }
+          }
+        }
+          transferComming = false;
+          moveToDestinations(amountToCarry); 
+      }
+    }
   }
   if(data.robotName == robotName)
   {
-    if(amountLocations ==2)
+    if(amountLocations > 1 && amountLocations <4)
     {
+    
       bool getOut = false;
       for(int i =0; i< data.amount.size() ; i++)
       {
@@ -878,8 +909,28 @@ void transferLogic(std::string robotName, std::vector<int> amount)
           }
         }
       }
+      moveToDestinations(amountToCarry);
     }
-    moveToDestinations(amountToCarry);
+    if(amountLocations > 3)
+    {    
+      int getOut = 0;
+      for(int i =0; i< data.amount.size() ; i++)
+      {
+        if(getOut < 2)
+        {
+          if(data.amount[i] > 0)
+          {
+            amountToCarry[i] = 0;
+            getOut = getOut +1;
+          }
+          else 
+          {
+            amountToCarry[i] = amountToCarry[i];
+          }
+        }
+      }
+      moveToDestinations(amountToCarry);
+    }
   }    
 }
 
@@ -952,7 +1003,7 @@ void commandReceived(multirob_test::cmdPickup command)
   newCommand.amountTotal = amountTotal2;
   newCommand.amount = command.amount;
   newCommand.sendLocation = command.sendLocation;
-  ROS_INFO("SL: %s", command.sendLocation ? "true" : "false");
+  //ROS_INFO("SL: %s", command.sendLocation ? "true" : "false");
   
 
   //Launch a new thread with these functions. @TODO Keep track of the amount of threads spun up. This can be as simple as a mutex to prevent a new thread from launching when the old one isn't finished yet.

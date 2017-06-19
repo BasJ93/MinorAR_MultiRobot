@@ -142,6 +142,8 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 # add_executable(${PROJECT_NAME}_node src/turtlebot_bas_node.cpp)
 add_executable(multirob_test_decision_logic src/decision_logic.cpp)
 
+add_dependencies(multirob_test_decision_logic multirob_test_generate_messages_cpp)
+
 target_compile_options(multirob_test_decision_logic PRIVATE -std=c++11)
 
 ## Rename C++ executable without prefix
