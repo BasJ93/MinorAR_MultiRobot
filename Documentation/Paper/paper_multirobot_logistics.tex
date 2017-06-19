@@ -1,5 +1,4 @@
 \documentclass[10pt, journal]{IEEEtran}
-\usepackage{lipsum}
 \usepackage{cite}
 \usepackage{url}
 \usepackage{graphicx}
@@ -68,7 +67,7 @@ All the robots in the group communicate with each other. As each robot is its ow
 
 The multimaster package provides two nodes, namely master-discovery and master-sync. The master-discovery node uses a multicast address to find the other masters on the network, and this list of masters is passed to the master-sync node to synchronize the specified topics.
 \subsection{Simulation}
-To test the software during development a simulation in Gazebo has been configured\cite{MultipleRobots}. The simulation has been configured for four robots, because the computer systems available could not simulate more robots at the same time with reasonable performance. Four robots also allow for testing assistive operation and provide the capability to have multiple robots running multiple different commands.
+To test the software during development a simulation in Gazebo has been configured\cite{MultipleRobots}. The simulation has been configured for four robots, because the computer systems available could not simulate more robots at the same time with reasonable performance. Four robots also allows for testing the collaborative operation and provide the capability to have multiple robots running multiple different commands.
 
 Within this simulation, the complete robots are simulated in a fully simulated world. This means that the robots are subject to simulated physics, collisions are possible and the entire software stack for each robot is running. To complete the simulation, a virtual world has been build for the robots to move around in. This would consists of eight one by one by one meter cubes that represent obstacles. The cubes are spaced through out this virtual world.
 \begin{figure}[htp]
