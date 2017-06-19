@@ -56,7 +56,9 @@ find_package(catkin REQUIRED COMPONENTS
  add_message_files(
    FILES
    cmdPickup.msg
+   pickupProducts.msg
    r2rpickupresponse.msg
+   transfer.msg
  )
 
 ## Generate services in the 'srv' folder
@@ -77,6 +79,7 @@ find_package(catkin REQUIRED COMPONENTS
  generate_messages(
    DEPENDENCIES
    std_msgs  # Or other packages containing msgs
+   geometry_msgs
  )
 
 ################################################
@@ -138,6 +141,8 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/turtlebot_bas_node.cpp)
 add_executable(multirob_test_decision_logic src/decision_logic.cpp)
+
+add_dependencies(multirob_test_decision_logic multirob_test_generate_messages_cpp)
 
 target_compile_options(multirob_test_decision_logic PRIVATE -std=c++11)
 
