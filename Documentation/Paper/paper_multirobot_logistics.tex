@@ -14,7 +14,7 @@
 Fontys University of Applied Sciences\\
 Eindhoven\\
 Email: smh.janssen@student.fontys.nl}
-\vspace{-2ex}}
+\vspace{-4ex}}
 
 %\author{Remco Aarts, Jeroen van den Akker, Robert Delmaar, Bas Janssen, Addie Perenboom, Dimitri Waard}
 
@@ -32,13 +32,13 @@ Multi-robot systems, Manufacturing automation, Autonomous vehicles, Mobile robot
 
 \section{Introduction}
 The decentralized multi-robot logistics project is one of the main projects of the Adaptive Robotics Minor at Fontys Hogeschool Engineering, in the 2016-2017 academic year. The goal of this project is to develop a system using mobile robots, both hardware and software, that is capable of transporting products between a warehouse and production locations in an Industry 4.0\cite{Industry40} setting. The system can be a replacement for a traditional conveyor belt, or can be used as a flexible addition to an existing conveyor system.
-During this project the software making the decisions on the robots has been developed, built on top of the Robot Operating System\cite{ROS}. This software is designed to receive commands from one or more workstations, and have the robots decide which robot should execute a command. The robots have the ability to request help from one another if more products have to be transported than a single robot can carry, or it is beneficial to transfer one or more products between two robots to get the products to their destination faster.
+During this project the software making the decisions on the robots has been developed. The software has been built on top of the Robot Operating System\cite{ROS}. This software is designed to receive commands from one or more workstations, and have the robots decide which robot should execute a command. The robots have the ability to request help from one another if more products have to be transported than a single robot can carry, or when it is beneficial to transfer one or more products between two robots to get the products to their destination faster.
 
 \section{Hardware}
 The turtlebots\cite{Turtlebot} must transport carriers from one point in a warehouse/factory to another. In addition to this it was decided that the turtlebots have to be able to transfer carriers from one bot to another. 
 
 \subsection{Transfer system}
-The position of the camera was moved to the front of the turtlebot, beneath the disk the laptop is placed on top of. Otherwise the components and carriers would occlude the view. The system that holds the carriers and is capable of transferring them is mounted on top of the disk above the laptop. Six grippers are mounted on the turtlebot, each can carry a single carrier. To align the carriers for transfer the grippers can revolve around the turtlebot. For this purpose, the grippers and a stepper motor are mounted on top of a Lazy Suzan bearing. A smaller gear on the motor and a large gear on the plate make it possible for the bearing to revolve. A reed contact and a magnet are used to keep track of the position of the grippers instead of an encoder. A slip ring is used to keep the electrical cables from entangling or breaking loose because of the movement. This design is displayed in figure \ref{MechanicalDesign}.
+Because the components and carriers would occlude the view, the position of the camera was moved to the front of the turtlebot, beneath the disk the laptop is placed on top of. The system that holds the carriers and is capable of transferring them is mounted on top of the disk above the laptop. Six grippers are mounted on the turtlebot, each can carry a single carrier. To align the carriers for transfer the grippers can rotate around the turtlebot. For this purpose, the grippers and a stepper motor are mounted on top of a Lazy Suzan bearing\footnote{A bearing made to deal with axial forces.}. A smaller gear on the motor and a large gear on the disk make it possible for the bearing to revolve. A reed contact and a magnet are used to keep track of the position of the grippers instead of an encoder. A slip ring is used to keep the electrical cables from entangling or breaking loose because of the movement. This design is displayed in figure \ref{MechanicalDesign}.
 %------------
 \begin{figure}[htp]
 \centering
@@ -57,7 +57,7 @@ The position of the camera was moved to the front of the turtlebot, beneath the 
 %--------------
 
 \subsection{Gripper}
-The gripper has a mechanical locking mechanism, so it doesn’t use any power to hold the carrier. A photograph of the gripper is shown in figure \ref{Gripper}. When a carrier is pushed into the gripper a plate with an axle attached to it will be pushed back. Pushing the plate back will cause the four fingers to grip the carrier, while the gripper will be mechanically locked by the axle. The axle can be released by a servo, unlocking the gripper. When released, a spring provides the force necessary to open the gripper. The carriers will be pushed into the gripper by driving the turtlebot against it. 
+The gripper has a mechanical locking mechanism, so it doesn’t use any power to hold the carrier. A photograph of the gripper is shown in figure \ref{Gripper}. When a carrier is pushed into the gripper a plate with an axle attached to it will be pushed back. Pushing the plate back will cause the four fingers to grip the carrier, and engage the mechanical lock. The lock can be released by a servo, releasing the gripper. When released, a spring provides the force necessary to open the gripper. The carriers will be pushed into the gripper by driving the turtlebot against it. 
 The carriers are a standard size of 50 by 50 by 100 millimeters and are intended to carry small parts such as bolts. 
 
 \section{Software}
