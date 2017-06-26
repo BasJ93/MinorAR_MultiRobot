@@ -13,7 +13,8 @@
  \IEEEauthorblockA{\\Minor Adaptive Robotics,
 Fontys University of Applied Sciences\\
 Eindhoven\\
-Email: smh.janssen@student.fontys.nl}}
+Email: smh.janssen@student.fontys.nl}
+\vspace{-2ex}}
 
 %\author{Remco Aarts, Jeroen van den Akker, Robert Delmaar, Bas Janssen, Addie Perenboom, Dimitri Waard}
 
@@ -26,22 +27,23 @@ Email: smh.janssen@student.fontys.nl}}
 This paper describes the design and implementation of a decentralized multi-robot logistics system. Both the hardware design and the software design and implementation are expanded upon below.
 \end{abstract}
 \begin{IEEEkeywords}
-
+Multi-robot systems, Manufacturing automation, Autonomous vehicles, Mobile robots, Manipulators
 \end{IEEEkeywords}
 
 \section{Introduction}
-The decentralized multi-robot logistics project is one of the main projects of the Adaptive Robotics Minor at Fontys Hogeschool Engineering, in the 2016-2017 academic year. The goal of this project is to develop a system, both hardware and software, that is capable of transporting products between a warehouse and production locations in an Industry 4.0 setting. The system can be a replacement for a traditional conveyor belt, or can be used as a flexible addition to an existing conveyor system.
+The decentralized multi-robot logistics project is one of the main projects of the Adaptive Robotics Minor at Fontys Hogeschool Engineering, in the 2016-2017 academic year. The goal of this project is to develop a system using mobile robots, both hardware and software, that is capable of transporting products between a warehouse and production locations in an Industry 4.0\cite{Industry40} setting. The system can be a replacement for a traditional conveyor belt, or can be used as a flexible addition to an existing conveyor system.
 During this project the software making the decisions on the robots has been developed, built on top of the Robot Operating System\cite{ROS}. This software is designed to receive commands from one or more workstations, and have the robots decide which robot should execute a command. The robots have the ability to request help from one another if more products have to be transported than a single robot can carry, or it is beneficial to transfer one or more products between two robots to get the products to their destination faster.
 
 \section{Hardware}
-The turtlebots must transport carriages from one point in a warehouse/factory to another. In addition to this it was decided that the turtlebots have to be able to transfer carriages from one bot to another. A morphological chart was used to create multiple solutions for this task. The solutions that were most promising and realistic were worked out in detail. Initially the turtlebots were meant to have multiple specializations. These versions were also in the morphological chart, out of which two were chosen, but in the end, it was financially and time-wise not feasible to implement both specializations. Therefore only one concept was realized.
-\subsection{Stackup}
-The position of the camera was moved to the front of the turtlebot, beneath the disk the laptop is placed on top of. The system that holds the carriages and is capable of transferring them is mounted on top of the disk above the laptop.
+The turtlebots\cite{Turtlebot} must transport carriers from one point in a warehouse/factory to another. In addition to this it was decided that the turtlebots have to be able to transfer carriers from one bot to another. 
+
+\subsection{Transfer system}
+The position of the camera was moved to the front of the turtlebot, beneath the disk the laptop is placed on top of. Otherwise the components and carriers would occlude the view. The system that holds the carriers and is capable of transferring them is mounted on top of the disk above the laptop. Six grippers are mounted on the turtlebot, each can carry a single carrier. To align the carriers for transfer the grippers can revolve around the turtlebot. For this purpose, the grippers and a stepper motor are mounted on top of a Lazy Suzan bearing. A smaller gear on the motor and a large gear on the plate make it possible for the bearing to revolve. A reed contact and a magnet are used to keep track of the position of the grippers instead of an encoder. A slip ring is used to keep the electrical cables from entangling or breaking loose because of the movement. This design is displayed in figure \ref{MechanicalDesign}.
 %------------
 \begin{figure}[htp]
 \centering
 \includegraphics[width=\columnwidth]{turtle_design}
-\caption{Mechanical Design}
+\caption{Mechanical Design, turtlebots with transfer system}
 \label{MechanicalDesign}
 \end{figure}
 %------------
@@ -49,16 +51,14 @@ The position of the camera was moved to the front of the turtlebot, beneath the 
 \begin{figure}[htp]
 \centering
 \includegraphics[width=\columnwidth]{gripper}
-\caption{Gripper}
+\caption{Gripper with mechanical locking mechanism}
 \label{Gripper}
 \end{figure}
 %--------------
-Six grippers are mounted on the turtlebot, each can carry a single carriage. To align the carriages for transfer the grippers can revolve around the turtlebot. For this purpose, the grippers and a stepper motor are mounted on top of a Lazy Suzan bearing. A smaller gear on the motor and a large gear on the plate make it possible for the bearing to revolve. A reed contact and a magnet are used to keep track of the position of the grippers instead of an encoder. A slip ring is used to keep the electrical cables from entangling or breaking loose because of the movement. This design is displayed in figure \ref{MechanicalDesign}.
 
 \subsection{Gripper}
-When a carriage is pushed into the gripper a plate with an axle attached to it will be pushed back. Pushing the plate back will cause the fingers to grip the carriage. The gripper will be mechanically locked by the axle, to be released by a servo. When released a spring pushes the plate back, causing the gripper to open. The carriages will be pushed into the gripper by driving the turtlebot against it. To get the alignment right the gripper is revolved around the turtlebot first.
-
-The carriages are a standard size of 50 by 50 by 100 millimeters and are intended to carry small parts such as bolts. A photograph of the gripper is shown in figure \ref{Gripper}.
+The gripper has a mechanical locking mechanism, so it doesn’t use any power to hold the carrier. A photograph of the gripper is shown in figure \ref{Gripper}. When a carrier is pushed into the gripper a plate with an axle attached to it will be pushed back. Pushing the plate back will cause the four fingers to grip the carrier, while the gripper will be mechanically locked by the axle. The axle can be released by a servo, unlocking the gripper. When released, a spring provides the force necessary to open the gripper. The carriers will be pushed into the gripper by driving the turtlebot against it. 
+The carriers are a standard size of 50 by 50 by 100 millimeters and are intended to carry small parts such as bolts. 
 
 \section{Software}
 
